@@ -1,0 +1,8 @@
+
+part1/isodir/
+
+*.bin
+
+*.iso
+
+*.o
