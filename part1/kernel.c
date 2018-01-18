@@ -6,6 +6,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define __i386__
+
 /* Check if the compiler thinks we are targeting the wrong operating system. */
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
