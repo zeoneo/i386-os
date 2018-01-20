@@ -22,7 +22,7 @@ Theory Related to following point is covered in os-dev.pdf in this direcotry whi
 5. VGA Text Mode
 6. Processor Real Mode and Protected Mode.
 7. GDT
-
+8. Memory Layout just after boot.
 
 
 I have been reading alot on os development and I am providing link of all the websites here.
