@@ -31,8 +31,9 @@ X86 Related
 1. http://wiki.osdev.org/Main_Page
 2. http://www.brokenthorn.com/Resources/OSDevIndex.html
 3. https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf
+4. https://web.archive.org/web/20160218174950/http://www.jamesmolloy.co.uk:80/tutorial_html/1.-Environment%20setup.html
 
 Raspberry Pi Related.
 
-4. http://www.valvers.com/open-software/raspberry-pi/step01-bare-metal-programming-in-cpt1/
-5. https://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/
+1. http://www.valvers.com/open-software/raspberry-pi/step01-bare-metal-programming-in-cpt1/
+2. https://www.cl.cam.ac.uk/projects/raspberrypi/tutorials/os/
