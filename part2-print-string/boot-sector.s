@@ -6,24 +6,19 @@ mov sp, bp; ; Point current stack pointer to top. Stack pointer will decrease fr
 
 mov bx, my_string ;
 call print_string;
+call print_nl;
 
 mov dx, 0x1234;
 call print_hex;
-
-mov bx, my_space ;
-call print_string;
+call print_nl;
 
 mov dx, 0x6789;
 call print_hex;
-
-mov bx, my_space ;
-call print_string;
+call print_nl;
 
 mov dx, 0xabcd;
 call print_hex;
-
-mov bx, my_space ;
-call print_string;
+call print_nl;
 
 mov dx, 0x00ef;
 call print_hex;
@@ -34,6 +29,7 @@ jmp $ ;Jump to the current address (i.e. forever).
 ; Include external files here ; It simply copies asse,bly code here
 %include "print_string.s"
 %include "print_hex.s" 
+%include "print_nl.s" 
 
 ; Data declaration here
 my_string:

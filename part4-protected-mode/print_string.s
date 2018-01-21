@@ -1,13 +1,15 @@
 print_string:
-    pusha ; push all cpu registers on stacke
+    pusha
 print_char:
-    mov ah, 0x0e ; Selecte screen print BIOS ISR
-    mov al, [bx] ;
-    int 0x10; ; print the character on screen
-    add bx, 0x01 ; increament bp register to point next char
-    mov ax, [bx] ;
-    cmp ax, 0x00 ;
-    jne print_char
-    popa ; pop all cpu register
-    ret ; return from function
-
+    mov al, [bx] ; 'bx' is the base address for the string
+    cmp al, 0 
+    je done
+print:
+    mov ah, 0x0e
+    int 0x10 ; 'al' already contains the char
+    ; increment pointer and do next loop
+    add bx, 1
+    jmp print_char
+done:
+    popa
+    ret

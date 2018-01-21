@@ -6,27 +6,23 @@ mov sp, bp; ; Point current stack pointer to top. Stack pointer will decrease fr
 
 mov bx, my_string ;
 call print_string;
+call print_nl;
 
 mov dx, 0x1234;
 call print_hex;
-
-mov bx, my_space ;
-call print_string;
+call print_nl;
 
 mov dx, 0x6789;
 call print_hex;
-
-mov bx, my_space ;
-call print_string;
+call print_nl;
 
 mov dx, 0xabcd;
 call print_hex;
-
-mov bx, my_space ;
-call print_string;
+call print_nl;
 
 mov dx, 0x00ef;
 call print_hex;
+call print_nl;
 
 mov bx, 0x9000;
 mov dh, 5;
@@ -34,8 +30,8 @@ mov dl, [BOOT_DRIVE];
 
 call disk_load
 mov dx, [0x9000]
-
-call print_hex
+call print_hex;
+call print_nl;
 
 mov dx, [0x9000 + 512]
 call print_hex
@@ -46,6 +42,7 @@ jmp $ ;Jump to the current address (i.e. forever).
 %include "print_string.s"
 %include "print_hex.s"
 %include "disk_load.s"
+%include "print_nl.s"
 
 ; Global Variable
 BOOT_DRIVE:
@@ -54,6 +51,8 @@ BOOT_DRIVE:
 ; Data declaration here
 my_string:
     db 'Hello world booting in 16 bit mode', 0 ; Null terminated string
+temp_msg:
+    db 'This should not be printed', 0 ; Null terminated string
 
 my_space:
     db ' ', 0 ; Null terminated string
