@@ -7,3 +7,4 @@ part1/isodir/
 
 *.o
 *.dis
+*.elf
