@@ -6,3 +6,4 @@ part1/isodir/
 *.iso
 
 *.o
+*.dis
