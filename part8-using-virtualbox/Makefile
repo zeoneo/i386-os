@@ -15,7 +15,7 @@ myos.iso: boot/boot-sector.bin kernel.bin
 	mkdir -p iso
 	dd if=/dev/zero of=iso/floppy.img bs=1024 count=1440
 	dd if=boot/boot-sector.bin of=iso/floppy.img seek=0 count=1 conv=notrunc
-	mkisofs -quiet -V 'MYOS' -input-charset iso8859-1 -o myos.iso -b floppy.img -hide floppy.img iso/
+	mkisofs -quiet -V 'MYOS' -input-charset iso8859-1 -o ../myos.iso -b floppy.img -hide floppy.img iso/
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
@@ -51,6 +51,7 @@ debug: os-image.bin kernel.elf
 
 clean:
 	rm -rf iso/
+	rm -rf ../*.iso
 	rm -f *.dmg *.img *.iso
 	rm -rf *.bin *.dis *.o os-image.bin *.elf
 	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o

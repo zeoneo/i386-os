@@ -14,6 +14,15 @@ al register.
 BIOS knows how to print character, it provides fonts etc.
 If you give character 'A' then it knows how to draw pixels on screen so that it looks like A to user.
 
+```
+This tutorial uses virtual box as emulator.
+To create .iso file we will use following commands
+
+dd // this is available in macOS
+
+mkisofs // for this you need install cdrtools "brew install cdrtools"
+
+```
 
 To compile code use 
 ```
