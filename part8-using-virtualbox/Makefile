@@ -13,8 +13,9 @@ CFLAGS = -g
 myos.iso: boot/boot-sector.bin kernel.bin
 	# cat $^ > os-image.bin
 	mkdir -p iso
+	cat boot/boot-sector.bin kernel.bin > disk.bin
 	dd if=/dev/zero of=iso/floppy.img bs=1024 count=1440
-	dd if=boot/boot-sector.bin of=iso/floppy.img seek=0 count=1 conv=notrunc
+	dd if=disk.bin of=iso/floppy.img seek=0 conv=notrunc
 	mkisofs -quiet -V 'MYOS' -input-charset iso8859-1 -o ../myos.iso -b floppy.img -hide floppy.img iso/
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
@@ -27,7 +28,7 @@ kernel.elf: boot/kernel_entry.o ${OBJ}
 	i386-elf-ld -o $@ -Ttext 0x1000 $^ 
 
 run: myos.iso
-	qemu-system-i386 -cdrom ./myos.iso
+	qemu-system-i386 -cdrom ../myos.iso
 
 vm: myos.iso
 	(killall VirtualBox && sleep 1) || true

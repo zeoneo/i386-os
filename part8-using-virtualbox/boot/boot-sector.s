@@ -38,7 +38,6 @@ mov bx, REAL_MODE_MSG ;
 call print_string;
 call print_nl;
 call load_kernel;
-jmp $
 call switch_to_pm
 
 jmp $ ;Jump to the current address (i.e. forever).
