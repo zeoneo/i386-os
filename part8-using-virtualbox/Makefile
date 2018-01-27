@@ -13,9 +13,11 @@ CFLAGS = -g
 myos.iso: boot/boot-sector.bin kernel.bin
 	# cat $^ > os-image.bin
 	mkdir -p iso
-	cat boot/boot-sector.bin kernel.bin > disk.bin
-	dd if=/dev/zero of=iso/floppy.img bs=1024 count=1440
-	dd if=disk.bin of=iso/floppy.img seek=0 conv=notrunc
+	dd if=/dev/zero of=iso/floppy.img count=5760
+	diskutil eraseVolume "MS-DOS FAT12" MYFLOPPY `hdiutil attach -nomount iso/floppy.img`
+	dd if=boot/Boot1.bin of=iso/floppy.img seek=0 conv=notrunc
+	cp boot/KRNLDR.SYS /Volumes/MYFLOPPY
+	diskutil eject MYFLOPPY
 	mkisofs -quiet -V 'MYOS' -input-charset iso8859-1 -o ../myos.iso -b floppy.img -hide floppy.img iso/
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
@@ -55,4 +57,4 @@ clean:
 	rm -rf ../*.iso
 	rm -f *.dmg *.img *.iso
 	rm -rf *.bin *.dis *.o os-image.bin *.elf
-	rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o
+	# rm -rf kernel/*.o boot/*.bin drivers/*.o boot/*.o
