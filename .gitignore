@@ -1,10 +1,14 @@
 
-part1/isodir/
+isodir/
 
 *.bin
-
+*.img
+*.dmg
 *.iso
 
 *.o
 *.dis
 *.elf
+iso/
+
+\.DS_Store
