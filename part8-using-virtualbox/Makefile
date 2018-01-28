@@ -13,13 +13,14 @@ CFLAGS = -g
 myos.iso: boot/boot-sector.bin kernel.bin
 	# cat $^ > os-image.bin
 	mkdir -p iso
-	dd if=/dev/zero of=iso/floppy.img count=5760
+	dd if=/dev/zero of=iso/floppy.img bs=1024 count=1440
 	diskutil eraseVolume "MS-DOS FAT12" MYFLOPPY `hdiutil attach -nomount iso/floppy.img`
+	diskutil eject MYFLOPPY
 	dd if=boot/Boot1.bin of=iso/floppy.img seek=0 conv=notrunc
+	hdiutil attach iso/floppy.img
 	cp boot/KRNLDR.SYS /Volumes/MYFLOPPY
 	diskutil eject MYFLOPPY
 	mkisofs -quiet -V 'MYOS' -input-charset iso8859-1 -o ../myos.iso -b floppy.img -hide floppy.img iso/
-
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 kernel.bin: boot/kernel_entry.o ${OBJ}
