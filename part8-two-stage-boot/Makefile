@@ -10,7 +10,7 @@ GDB = i386-elf-gdb
 CFLAGS = -g
 
 # First rule is run by default
-myos.iso: boot/stage1/boot1.bin boot/stage2/stage2.bin kernel.bin
+myos.iso: boot/stage1/boot1.bin boot/stage2/stage2.bin kernel.bin kernel/KRNL32.EXE
 	# cat $^ > os-image.bin
 	mkdir -p iso
 	dd if=/dev/zero of=iso/floppy.img bs=1024 count=1440
@@ -19,6 +19,7 @@ myos.iso: boot/stage1/boot1.bin boot/stage2/stage2.bin kernel.bin
 	dd if=boot/stage1/boot1.bin of=iso/floppy.img seek=0 conv=notrunc
 	hdiutil attach iso/floppy.img
 	cp boot/stage2/stage2.bin /Volumes/MYFLOPPY
+	cp kernel/KRNL32.EXE /Volumes/MYFLOPPY
 	diskutil eject MYFLOPPY
 	mkisofs -quiet -V 'MYOS' -input-charset iso8859-1 -o ../myos.iso -b floppy.img -hide floppy.img iso/
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
