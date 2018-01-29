@@ -29,10 +29,10 @@ jmp	main				; go to start
 msgFailure db 0x0D, 0x0A, "Failed", 0x00
 welcomeMessage db 0x0D, 0x0A, "Landed in STAGE TWO...", 0x00
 enableA20Msg db 0x0D, 0x0A, "Enable A20 Installed GDT", 0x00
-ImageName     db "KRNL32  EXE"
+ImageName     db "KRNL32  BIN"
 ImageSize     db 0
-IMAGE_RMODE_BASE equ 0x3000
-IMAGE_PMODE_BASE equ 0x100000
+IMAGE_RMODE_BASE equ 0x1000
+IMAGE_PMODE_BASE equ 0x1000
 
 
 main:
@@ -108,25 +108,25 @@ Stage3:
 
 	; call	ClrScr32
 
-CopyImage:
-  	 mov	eax, dword [ImageSize]
-  	 movzx	ebx, word [bpbBytesPerSector]
-  	 mul	ebx
-  	 mov	ebx, 4
-  	 div	ebx
-   	 cld
-   	 mov    esi, IMAGE_RMODE_BASE
-   	 mov	edi, IMAGE_PMODE_BASE
-   	 mov	ecx, eax
-   	 rep	movsd                   ; copy image to its protected mode address
-
+; CopyImage:
+;   	 mov	eax, dword [ImageSize]
+;   	 movzx	ebx, word [bpbBytesPerSector]
+;   	 mul	ebx
+;   	 mov	ebx, 4
+;   	 div	ebx
+;    	 cld
+;    	 mov    esi, IMAGE_RMODE_BASE
+;    	 mov	edi, IMAGE_PMODE_BASE
+;    	 mov	ecx, eax
+;    	 rep	movsd                   ; copy image to its protected mode address
+	jmp 0x1000
 TestImage:
-  	  mov    ebx, [IMAGE_PMODE_BASE+60]
-  	  add    ebx, IMAGE_PMODE_BASE    ; ebx now points to file sig (PE00)
+  	  mov    ebx, [IMAGE_RMODE_BASE+60]
+  	  add    ebx, IMAGE_RMODE_BASE    ; ebx now points to file sig (PE00)
   	  mov    esi, ebx
   	  mov    edi, ImageSig
   	  cmpsw
-  	  je     EXECUTE
+  	  jmp     EXECUTE
   	  mov	ebx, BadImage
   	  call	Puts32
   	  cli
