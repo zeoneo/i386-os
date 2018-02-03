@@ -15,9 +15,6 @@ start:jmp	main				; go to start
 ;*******************************************************
 
 %include "boot/stage2/print16.s"
-%include "boot/stage2/print32.s"
-%include "boot/stage2/floppy16_driver.s"
-%include "boot/stage2/fat12.s"
 %include "boot/stage2/gdt.s"
 %include "boot/stage2/a20.s"
 
