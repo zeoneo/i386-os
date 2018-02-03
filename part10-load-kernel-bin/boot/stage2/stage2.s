@@ -32,7 +32,7 @@ enableA20Msg db 0x0D, 0x0A, "Enable A20 Installed GDT", 0x00
 ImageName     db "KRNL32  BIN"
 ImageSize     db 0
 IMAGE_PMODE_BASE equ 0x0100000
-IMAGE_RMODE_BASE equ 0x1000
+IMAGE_RMODE_BASE equ 0x3000
 main:
 	;-------------------------------;
 	;   Setup segments and stack	;
@@ -119,8 +119,6 @@ CopyImage:
    	 mov	ecx, eax
    	 rep	movsd                   ; copy image to its protected mode address
 	jmp IMAGE_PMODE_BASE
-
-
 
     cli
 	hlt
