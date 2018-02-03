@@ -8,13 +8,17 @@
 ;*******************************************************
 
 [bits 16]
-[extern bootmain]
-start:jmp	main				; go to start
+[org 0x500]
+
+jmp	main				; go to start
 ;*******************************************************
 ;	Preprocessor directives
 ;*******************************************************
 
 %include "boot/stage2/print16.s"
+%include "boot/stage2/print32.s"
+%include "boot/stage2/floppy16_driver.s"
+%include "boot/stage2/fat12.s"
 %include "boot/stage2/gdt.s"
 %include "boot/stage2/a20.s"
 
@@ -27,9 +31,8 @@ welcomeMessage db 0x0D, 0x0A, "Landed in STAGE TWO...", 0x00
 enableA20Msg db 0x0D, 0x0A, "Enable A20 Installed GDT", 0x00
 ImageName     db "KRNL32  BIN"
 ImageSize     db 0
-
-
-
+IMAGE_PMODE_BASE equ 0x1000
+IMAGE_RMODE_BASE equ 0x1000
 main:
 	;-------------------------------;
 	;   Setup segments and stack	;
@@ -53,7 +56,19 @@ main:
 	mov si, enableA20Msg
     call Print16
 
+	call	LoadRoot
+   	mov    	ebx, 0
+   	mov		ebp, IMAGE_RMODE_BASE
+   	mov 	esi, ImageName
+	call	LoadFile		; load our file
+   	mov   	dword [ImageSize], ecx
+	cmp		ax, 0
 	je		EnterStage3
+	mov		si, msgFailure
+	call   	Print16
+	mov		ah, 0
+	int     0x16                    ; await keypress
+	int     0x19                    ; warm boot computer
 
 	jmp $;
 
@@ -89,5 +104,23 @@ Stage3:
 	mov	es, ax
 	mov	esp, 90000h		; stack begins from 90000h
 
-	call bootmain
+	; call	ClrScr32
 
+CopyImage:
+  	 mov	eax, dword [ImageSize]
+  	 movzx	ebx, word [bpbBytesPerSector]
+  	 mul	ebx
+  	 mov	ebx, 4
+	 mov 	edx, 0x0000
+  	 div	ebx
+   	 cld
+   	 mov    esi, IMAGE_RMODE_BASE
+   	 mov	edi, IMAGE_PMODE_BASE
+   	 mov	ecx, eax
+   	 rep	movsd                   ; copy image to its protected mode address
+	jmp IMAGE_PMODE_BASE
+
+
+
+    cli
+	hlt
