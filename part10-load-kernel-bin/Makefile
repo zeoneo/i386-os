@@ -22,6 +22,7 @@ myos.iso: boot/stage1/boot1.bin boot/stage2/stage2.bin krnl32.bin
 	cp krnl32.bin /Volumes/MYFLOPPY
 	diskutil eject MYFLOPPY
 	mkisofs -quiet -V 'MYOS' -input-charset iso8859-1 -o ../myos.iso -b floppy.img -hide floppy.img iso/
+
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 krnl32.bin: boot/kernel_entry.o ${OBJ}
