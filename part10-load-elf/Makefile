@@ -25,11 +25,11 @@ myos.iso: boot/stage1/boot1.bin boot/stage2/stage2.bin krnl32.bin
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 krnl32.bin: boot/kernel_entry.o ${OBJ}
-	i386-elf-ld -o $@ -Ttext 0x1000 $^ --oformat binary
+	i386-elf-ld -o $@ -Ttext 0x0100000 $^ --oformat binary
 
 # Used for debugging purposes
 kernel.elf: boot/kernel_entry.o ${OBJ}
-	i386-elf-ld -o $@ -Ttext 0x1000 $^ 
+	i386-elf-ld -o $@ -Ttext 0x0100000 $^ 
 
 run: myos.iso
 	qemu-system-i386 -cdrom ../myos.iso
