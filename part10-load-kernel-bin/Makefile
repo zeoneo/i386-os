@@ -3,6 +3,8 @@ HEADERS = $(wildcard kernel/*.h drivers/*.h)
 # Nice syntax for file extension replacement
 OBJ = ${C_SOURCES:.c=.o}
 
+
+
 # Change this if your cross-compiler is somewhere else
 CC = i386-elf-gcc
 GDB = i386-elf-gdb
@@ -18,6 +20,8 @@ myos.iso: boot/stage1/boot1.bin boot/stage2/stage2.bin krnl32.bin
 	diskutil eject MYFLOPPY
 	dd if=boot/stage1/boot1.bin of=iso/floppy.img seek=0 conv=notrunc
 	hdiutil attach iso/floppy.img
+	# mcopy -i iso/floppy.img krnl32.bin ::/
+	# mcopy -i iso/floppy.img boot/stage2/stage2.bin ::/
 	cp boot/stage2/stage2.bin /Volumes/MYFLOPPY
 	cp krnl32.bin /Volumes/MYFLOPPY
 	diskutil eject MYFLOPPY
@@ -29,21 +33,22 @@ krnl32.bin: boot/kernel_entry.o ${OBJ}
 	i386-elf-ld -o $@ -Ttext 0x0100000 $^ --oformat binary
 
 # Used for debugging purposes
-kernel.elf: boot/kernel_entry.o ${OBJ}
+krnl32.elf: boot/kernel_entry.o ${OBJ}
 	i386-elf-ld -o $@ -Ttext 0x0100000 $^ 
 
 run: myos.iso
-	qemu-system-i386 -cdrom ../myos.iso
+	qemu-system-i386 -fda iso/floppy.img
 
 vm: myos.iso
 	(killall VirtualBox && sleep 1) || true
 	virtualBox --startvm "myos" &
 
 # Open the connection to qemu and load our kernel-object file with symbols
-debug: os-image.bin kernel.elf
-	qemu-system-i386 -s -fda os-image.bin &
-	${GDB} -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
-
+debug: krnl32.bin krnl32.elf
+	qemu-system-i386 -fda iso/floppy.img -boot a -s -S  -monitor stdio
+	# i386-elf-gdb -ex "target remote localhost:1234" -ex "symbol-file krnl32.elf"
+	# ndisasm -b16 -o7c00h -a -s7c3eh boot/stage1/boot1.bin
+	# ndisasm -b16 -o500h boot/stage2/stage2.bin
 # Generic rules for wildcards
 # To make an object, always compile from its .c
 %.o: %.c ${HEADERS}

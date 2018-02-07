@@ -8,7 +8,7 @@
 
 bits	16                                                   ; we are in 16 bit real mode
 
-org		0                                                    ; we will set regisers later
+org		0                                                  ; we will set regisers later
 
 start:
     jmp	main                                              ; jump to start of bootloader
@@ -75,7 +75,8 @@ main:
     ; ----------------------------------------------------
 
     call loadRootDirectoryTable;
-
+    mov si, msgBad;
+    call Print
     jmp $
 
 %include "boot/stage1/print16.s"
@@ -89,11 +90,11 @@ datasector  dw 0x0000
 cluster     dw 0x0000
 ImageName   db "STAGE2  BIN"
 BOOT_DRIVE db 0
-REAL_MODE_MSG db 'Hello world booting in 16 bit mode', 0 ; Null terminated string           ; Null terminated string
+REAL_MODE_MSG db 'booting in 16 bit mode', 0 ; Null terminated string           ; Null terminated string
 msgCRLF     db 0x0D, 0x0A, 0x00
 msgProgress db ".", 0x00
 msgFailure  db 0x0D, 0x0A, "STAGE 2 Not found . Please Reboot", 0x0D, 0x0A, 0x00
-     
+msgBad db 0x0D, 0x0A, "S1", 0x00
 
 TIMES 510-($-$$) DB 0
 DW 0xAA55
