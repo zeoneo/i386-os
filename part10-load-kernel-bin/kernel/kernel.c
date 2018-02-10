@@ -1,6 +1,11 @@
 
 #include "../drivers/vga.h"
 #include "../drivers/screen.h"
+#include "util.h"
+#include "../cpu/isr.h"
+#include "../cpu/idt.h"
+#include "../cpu/timer.h"
+#include "../drivers/keyboard.h"
 
 void dummy_test_entrypoint()
 {
@@ -9,17 +14,17 @@ void dummy_test_entrypoint()
 void main()
 {
     clear_screen();
-    kprint("Hello World ...!");
-    kprint("This should print in new line ...!");
+    kprint("Hello ZERO ...!");
 
-    kprint_at("X", 1, 6);
-    kprint_at("This text spans multiple lines", 75, 10);
-    kprint_at("There is a line\nbreak", 0, 20);
-    kprint("There is a line\nbreak");
-    kprint_at("What happens when we run out of space?", 45, 24);
+    isr_install();
 
+    asm volatile("sti");
+    init_timer(50);
+    /* Comment out the timer IRQ handler to read
+     * the keyboard IRQs easier */
+    init_keyboard();
     while (1)
-        ;
+        ; // never execute code below. Just for linking large kernel
     vgaGraphicsModeInit();
     fillRectangle(0, 0, 320, 200, 0x00, 0x00, 0xA8); //fill Screen with blue pixels
 }

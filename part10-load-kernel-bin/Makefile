@@ -1,5 +1,5 @@
-C_SOURCES = $(wildcard kernel/*.c drivers/*.c)
-HEADERS = $(wildcard kernel/*.h drivers/*.h)
+C_SOURCES = $(wildcard kernel/*.c cpu/*.c drivers/*.c libc/*.c)
+HEADERS = $(wildcard kernel/*.h cpu/*.h drivers/*.h libc/*.h)
 # Nice syntax for file extension replacement
 OBJ = ${C_SOURCES:.c=.o}
 
@@ -19,25 +19,25 @@ myos.iso: boot/stage1/boot1.bin boot/stage2/stage2.bin krnl32.bin
 	diskutil eraseVolume "MS-DOS FAT12" MYFLOPPY `hdiutil attach -nomount iso/floppy.img`
 	diskutil eject MYFLOPPY
 	dd if=boot/stage1/boot1.bin of=iso/floppy.img seek=0 conv=notrunc
-	hdiutil attach iso/floppy.img
-	# mcopy -i iso/floppy.img krnl32.bin ::/
-	# mcopy -i iso/floppy.img boot/stage2/stage2.bin ::/
-	cp boot/stage2/stage2.bin /Volumes/MYFLOPPY
-	cp krnl32.bin /Volumes/MYFLOPPY
-	diskutil eject MYFLOPPY
+	# hdiutil attach iso/floppy.img
+	mcopy -i iso/floppy.img krnl32.bin ::/
+	mcopy -i iso/floppy.img boot/stage2/stage2.bin ::/
+	# cp boot/stage2/stage2.bin /Volumes/MYFLOPPY
+	# cp krnl32.bin /Volumes/MYFLOPPY
+	# diskutil eject MYFLOPPY
 	mkisofs -quiet -V 'MYOS' -input-charset iso8859-1 -o ../myos.iso -b floppy.img -hide floppy.img iso/
 
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
-krnl32.bin: boot/kernel_entry.o ${OBJ}
+krnl32.bin: boot/kernel_entry.o ${OBJ} cpu/interrupt.o
 	i386-elf-ld -o $@ -Ttext 0x0100000 $^ --oformat binary
 
 # Used for debugging purposes
-krnl32.elf: boot/kernel_entry.o ${OBJ}
+krnl32.elf: boot/kernel_entry.o ${OBJ} cpu/interrupt.o
 	i386-elf-ld -o $@ -Ttext 0x0100000 $^ 
 
 run: myos.iso
-	qemu-system-i386 -fda iso/floppy.img
+	qemu-system-i386 -fda iso/floppy.img -monitor stdio
 
 vm: myos.iso
 	(killall VirtualBox && sleep 1) || true
