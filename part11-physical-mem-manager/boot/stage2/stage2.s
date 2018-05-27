@@ -160,6 +160,9 @@ CopyImage:
    	 mov	edi, IMAGE_PMODE_BASE
    	 mov	ecx, eax
    	 rep	movsd                   ; copy image to its protected mode address
+	 mov	eax, 0x2BADB002		; multiboot specs say eax should be this
+	 mov	ebx, 0
+	 mov edx, [ImageSize]
 	 push	dword boot_info
 	 jmp IMAGE_PMODE_BASE
 

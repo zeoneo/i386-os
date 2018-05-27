@@ -5,8 +5,10 @@
 #include "debug_display.h"
 #include "../cpu/isr.h"
 #include "../cpu/idt.h"
+#include "../cpu/gdt.h"
 #include "../cpu/timer.h"
 #include "../drivers/keyboard.h"
+
 
 //! format of a memory region
 struct memory_region {
@@ -33,9 +35,16 @@ void dummy_test_entrypoint()
 void main(struct multiboot_info * bootinfo)
 {
     uint32_t kernelSize=0;
+    asm volatile (
+        ""
+        : "=d" (kernelSize)
+        // no inputs, no clobbers
+    );
     uint32_t memSize = 1024 + bootinfo->m_memoryLo + bootinfo->m_memoryHi*64;
     int i;
 
+
+	
     DebugClrScr (0x13);
 	DebugGotoXY (0,0);
 	DebugSetColor (0x3F);
@@ -46,38 +55,38 @@ void main(struct multiboot_info * bootinfo)
 	DebugGotoXY (0,2);
 	DebugSetColor (0x17);
 
-    DebugPrintf("boo_info memSize:%i mem_lo:%i mem_hi:%i ",memSize, bootinfo->m_memoryLo, bootinfo->m_memoryHi);
+    //DebugPrintf("boo_info memSize:%i mem_lo:%i mem_hi:%i ",memSize, bootinfo->m_memoryLo, bootinfo->m_memoryHi);
 
-    //DebugPrintf("pmm initialized with KB physical memory; memLo: %i memHi: %i\n\n",
-		// bootinfo->m_memoryLo,bootinfo->m_memoryHi);
-
-    while(1);
-
+    DebugPrintf("pmm initialized with %i KB physical memory; memLo: %i memHi: %i\n\n", memSize, bootinfo->m_memoryLo,bootinfo->m_memoryHi);
+	
     isr_install();
-
-    asm volatile("sti");
-    init_timer(50);
+	init_timer(50);
     /* Comment out the timer IRQ handler to read
      * the keyboard IRQs easier */
-    init_keyboard();
+		
+    // init_keyboard();
 
-    kprint("-------Physical Memory Manager Demo-------");
-    
-     __asm__("mov %%cx, %%dx" : : "c" (kernelSize));
+	
+	asm volatile("sti");
+	while(1);
 
+    DebugPrintf("pmm initialized with %i", kernelSize);
 
     	//! get memory size in KB
-
+  
 
 	//! initialize the physical memory manager
 	//! we place the memory bit map used by the PMM at the end of the kernel in memory
 	pmmngr_init (memSize, 0x100000 + kernelSize*512);
-
+      while(1);
   
-    kprint("pmm initialized with %i KB physical memory; memLo: %i memHi: %i\n\n");
-	kprint ("Physical Memory Map:\n");
+   DebugPrintf("pmm initialized with %i KB physical memory; memLo: %i memHi: %i\n\n",
+		memSize,bootinfo->m_memoryLo,bootinfo->m_memoryHi);
 
-	struct memory_region *region = (struct memory_region*)0x1000;
+	DebugSetColor (0x19);
+	DebugPrintf ("Physical Memory Map:\n");
+
+	struct memory_region*	region = (struct memory_region*)0x1000;
 
 	for (i=0; i<15; ++i) {
 
@@ -90,11 +99,10 @@ void main(struct multiboot_info * bootinfo)
 			break;
 
 		//! display entry
-		kprint ("region %i: start: 0x%x%x length (bytes): 0x%x%x type: %i (%s)\n");
-        // , i, 
-		// 	region[i].startHi, region[i].startLo,
-		// 	region[i].sizeHi,region[i].sizeLo,
-		// 	region[i].type, strMemoryTypes[region[i].type-1]);
+		DebugPrintf ("region %i: start: 0x%x%x length (bytes): 0x%x%x type: %i (%s)\n", i, 
+			region[i].startHi, region[i].startLo,
+			region[i].sizeHi,region[i].sizeLo,
+			region[i].type, strMemoryTypes[region[i].type-1]);
 
 		//! if region is avilable memory, initialize the region for use
 		if (region[i].type==1)
@@ -104,25 +112,24 @@ void main(struct multiboot_info * bootinfo)
 	//! deinit the region the kernel is in as its in use
 	pmmngr_deinit_region (0x100000, kernelSize*512);
 
-	// DebugSetColor (0x17);
+	DebugSetColor (0x17);
 
-	kprint("\npmm regions initialized: %i allocation blocks; used or reserved blocks: %i\nfree blocks: %i\n");
-    // ,
-		// pmmngr_get_block_count (),  pmmngr_get_use_block_count (), pmmngr_get_free_block_count () );
+	DebugPrintf ("\npmm regions initialized: %i allocation blocks; used or reserved blocks: %i\nfree blocks: %i\n",
+		pmmngr_get_block_count (),  pmmngr_get_use_block_count (), pmmngr_get_free_block_count () );
 
 	//! allocating and deallocating memory examples...
 
-	// DebugSetColor (0x12);
+	DebugSetColor (0x12);
 
 	uint32_t* p = (uint32_t*)pmmngr_alloc_block ();
-	kprint("\np allocated at 0x%x");
+	DebugPrintf ("\np allocated at 0x%x", p);
 
 	uint32_t* p2 = (uint32_t*)pmmngr_alloc_blocks (2);
-	kprint("\nallocated 2 blocks for p2 at 0x%x");
+	DebugPrintf ("\nallocated 2 blocks for p2 at 0x%x", p2);
 
 	pmmngr_free_block (p);
 	p = (uint32_t*)pmmngr_alloc_block ();
-	kprint("\nUnallocated p to free block 1. p is reallocated to 0x%x");
+	DebugPrintf ("\nUnallocated p to free block 1. p is reallocated to 0x%x", p);
 
 	pmmngr_free_block (p);
 	pmmngr_free_blocks (p2, 2);

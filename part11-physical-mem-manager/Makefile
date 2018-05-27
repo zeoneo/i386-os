@@ -36,7 +36,7 @@ krnl32.elf: boot/kernel_entry.o ${OBJ} cpu/interrupt.o
 
 run: myos.iso
 	echo ${OBJ}
-	qemu-system-i386 -fda iso/floppy.img -monitor stdio
+	qemu-system-i386 -m 130M -fda iso/floppy.img -monitor stdio
 
 vm: myos.iso
 	(killall VirtualBox && sleep 1) || true

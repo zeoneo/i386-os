@@ -10,6 +10,7 @@
 
 #include "../libc/string.h"
 #include "./mmngr_phys.h"
+#include "../kernel/debug_display.h"
 
 //============================================================================
 //    IMPLEMENTATION PRIVATE DEFINITIONS / ENUMERATIONS / SIMPLE TYPEDEFS
@@ -156,9 +157,11 @@ void	pmmngr_init (size_t memSize, physical_addr bitmap) {
 	_mmngr_memory_map	=	(uint32_t*) bitmap;
 	_mmngr_max_blocks	=	(pmmngr_get_memory_size()*1024) / PMMNGR_BLOCK_SIZE;
 	_mmngr_used_blocks	=	_mmngr_max_blocks;
-
 	//! By default, all of memory is in use
+	DebugPrintf("\n_mmngr_max_blocks:%i", _mmngr_max_blocks);
+	DebugPrintf("\n pmmngr_get_block_count:%i ", pmmngr_get_block_count()/PMMNGR_BLOCKS_PER_BYTE);
 	memset (_mmngr_memory_map, 0xf, pmmngr_get_block_count() / PMMNGR_BLOCKS_PER_BYTE );
+	while(1);
 }
 
 void	pmmngr_init_region (physical_addr base, size_t size) {
