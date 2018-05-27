@@ -21,6 +21,8 @@ jmp	main				; go to start
 %include "boot/stage2/fat12.s"
 %include "boot/stage2/gdt.s"
 %include "boot/stage2/a20.s"
+%include "boot/stage2/bootinfo.s"
+%include "boot/stage2/mmap.s"
 
 ;*******************************************************
 ;	Data Section
@@ -33,6 +35,33 @@ ImageName     db "KRNL32  BIN"
 ImageSize     db 0
 IMAGE_PMODE_BASE equ 0x0100000
 IMAGE_RMODE_BASE equ 0x7E00
+
+boot_info:
+istruc multiboot_info
+	at multiboot_info.flags,			dd 0
+	at multiboot_info.memoryLo,			dd 0
+	at multiboot_info.memoryHi,			dd 0
+	at multiboot_info.bootDevice,		dd 0
+	at multiboot_info.cmdLine,			dd 0
+	at multiboot_info.mods_count,		dd 0
+	at multiboot_info.mods_addr,		dd 0
+	at multiboot_info.syms0,			dd 0
+	at multiboot_info.syms1,			dd 0
+	at multiboot_info.syms2,			dd 0
+	at multiboot_info.mmap_length,		dd 0
+	at multiboot_info.mmap_addr,		dd 0
+	at multiboot_info.drives_length,	dd 0
+	at multiboot_info.drives_addr,		dd 0
+	at multiboot_info.config_table,		dd 0
+	at multiboot_info.bootloader_name,	dd 0
+	at multiboot_info.apm_table,		dd 0
+	at multiboot_info.vbe_control_info,	dd 0
+	at multiboot_info.vbe_mode_info,	dw 0
+	at multiboot_info.vbe_interface_seg,dw 0
+	at multiboot_info.vbe_interface_off,dw 0
+	at multiboot_info.vbe_interface_len,dw 0
+iend
+
 main:
 	;-------------------------------;
 	;   Setup segments and stack	;
@@ -50,11 +79,24 @@ main:
 	mov si, welcomeMessage
     call Print16
 
+	mov     [boot_info+multiboot_info.bootDevice], dl ; save boot device in multibootInfo
+
 	call	_EnableA20
 	call	InstallGDT
 	sti
 	mov si, enableA20Msg
     call Print16
+
+	xor		eax, eax
+	xor		ebx, ebx
+	call	BiosGetMemorySize64MB
+	mov		word [boot_info+multiboot_info.memoryHi], bx
+	mov		word [boot_info+multiboot_info.memoryLo], ax
+
+	mov		eax, 0x0
+	mov		ds, ax
+	mov		di, 0x1000
+	call	BiosGetMemoryMap
 
 	call	LoadRoot
    	mov    	ebx, 0
@@ -118,7 +160,8 @@ CopyImage:
    	 mov	edi, IMAGE_PMODE_BASE
    	 mov	ecx, eax
    	 rep	movsd                   ; copy image to its protected mode address
-	jmp IMAGE_PMODE_BASE
+	 push	dword boot_info
+	 jmp IMAGE_PMODE_BASE
 
     cli
 	hlt

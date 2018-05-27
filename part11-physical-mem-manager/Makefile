@@ -3,13 +3,11 @@ HEADERS = $(wildcard kernel/*.h cpu/*.h drivers/*.h libc/*.h)
 # Nice syntax for file extension replacement
 OBJ = ${C_SOURCES:.c=.o}
 
-
-
 # Change this if your cross-compiler is somewhere else
 CC = i386-elf-gcc
 GDB = i386-elf-gdb
 # -g: Use debugging symbols in gcc
-CFLAGS = -g -std=gnu99
+CFLAGS = -g
 
 # First rule is run by default
 myos.iso: boot/stage1/boot1.bin boot/stage2/stage2.bin krnl32.bin
@@ -37,6 +35,7 @@ krnl32.elf: boot/kernel_entry.o ${OBJ} cpu/interrupt.o
 	i386-elf-ld -o $@ -Ttext 0x0100000 $^ 
 
 run: myos.iso
+	echo ${OBJ}
 	qemu-system-i386 -fda iso/floppy.img -monitor stdio
 
 vm: myos.iso
@@ -53,7 +52,6 @@ debug: krnl32.bin krnl32.elf
 # To make an object, always compile from its .c
 %.o: %.c ${HEADERS}
 	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
-
 %.o: %.s
 	nasm $< -f elf -o $@
 
