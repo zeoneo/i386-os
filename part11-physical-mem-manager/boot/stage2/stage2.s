@@ -164,6 +164,13 @@ CopyImage:
 	 mov	ebx, 0
 	 mov edx, [ImageSize]
 	 push	dword boot_info
+
+	 mov eax, 0x10  ; Load data segment selector for KM Data Segment descriptor
+  	mov ds, eax     ; Load data segment selector registers
+ 	mov  es, eax
+  	mov fs, eax
+  	mov gs, eax
+  	mov ss, eax
 	 jmp IMAGE_PMODE_BASE
 
     cli

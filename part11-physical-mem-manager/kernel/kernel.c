@@ -64,11 +64,11 @@ void main(struct multiboot_info * bootinfo)
     /* Comment out the timer IRQ handler to read
      * the keyboard IRQs easier */
 		
-    // init_keyboard();
+    init_keyboard();
 
 	
 	asm volatile("sti");
-	while(1);
+
 
     DebugPrintf("pmm initialized with %i", kernelSize);
 
@@ -77,8 +77,8 @@ void main(struct multiboot_info * bootinfo)
 
 	//! initialize the physical memory manager
 	//! we place the memory bit map used by the PMM at the end of the kernel in memory
-	pmmngr_init (memSize, 0x100000 + kernelSize*512);
-      while(1);
+	pmmngr_init (memSize, 0x104d80);
+
   
    DebugPrintf("pmm initialized with %i KB physical memory; memLo: %i memHi: %i\n\n",
 		memSize,bootinfo->m_memoryLo,bootinfo->m_memoryHi);
@@ -86,28 +86,28 @@ void main(struct multiboot_info * bootinfo)
 	DebugSetColor (0x19);
 	DebugPrintf ("Physical Memory Map:\n");
 
-	struct memory_region*	region = (struct memory_region*)0x1000;
+	// struct memory_region*	region = (struct memory_region*)0x1000;
 
-	for (i=0; i<15; ++i) {
+	// for (i=0; i<15; ++i) {
 
-		//! sanity check; if type is > 4 mark it reserved
-		if (region[i].type>4)
-			region[i].type=1;
+	// 	//! sanity check; if type is > 4 mark it reserved
+	// 	if (region[i].type>4)
+	// 		region[i].type=1;
 
-		//! if start address is 0, there is no more entries, break out
-		if (i>0 && region[i].startLo==0)
-			break;
+	// 	//! if start address is 0, there is no more entries, break out
+	// 	if (i>0 && region[i].startLo==0)
+	// 		break;
 
-		//! display entry
-		DebugPrintf ("region %i: start: 0x%x%x length (bytes): 0x%x%x type: %i (%s)\n", i, 
-			region[i].startHi, region[i].startLo,
-			region[i].sizeHi,region[i].sizeLo,
-			region[i].type, strMemoryTypes[region[i].type-1]);
+	// 	//! display entry
+	// 	DebugPrintf ("region %i: start: 0x%x%x length (bytes): 0x%x%x type: %i (%s)\n", i, 
+	// 		region[i].startHi, region[i].startLo,
+	// 		region[i].sizeHi,region[i].sizeLo,
+	// 		region[i].type, strMemoryTypes[region[i].type-1]);
 
-		//! if region is avilable memory, initialize the region for use
-		if (region[i].type==1)
-			pmmngr_init_region (region[i].startLo, region[i].sizeLo);
-	}
+	// 	//! if region is avilable memory, initialize the region for use
+	// 	if (region[i].type==1)
+	// 		pmmngr_init_region (region[i].startLo, region[i].sizeLo);
+	// }
 
 	//! deinit the region the kernel is in as its in use
 	pmmngr_deinit_region (0x100000, kernelSize*512);

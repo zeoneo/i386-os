@@ -161,7 +161,6 @@ void	pmmngr_init (size_t memSize, physical_addr bitmap) {
 	DebugPrintf("\n_mmngr_max_blocks:%i", _mmngr_max_blocks);
 	DebugPrintf("\n pmmngr_get_block_count:%i ", pmmngr_get_block_count()/PMMNGR_BLOCKS_PER_BYTE);
 	memset (_mmngr_memory_map, 0xf, pmmngr_get_block_count() / PMMNGR_BLOCKS_PER_BYTE );
-	while(1);
 }
 
 void	pmmngr_init_region (physical_addr base, size_t size) {
