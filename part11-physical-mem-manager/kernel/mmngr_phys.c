@@ -10,7 +10,6 @@
 
 #include "../libc/string.h"
 #include "./mmngr_phys.h"
-#include "../kernel/debug_display.h"
 
 //============================================================================
 //    IMPLEMENTATION PRIVATE DEFINITIONS / ENUMERATIONS / SIMPLE TYPEDEFS
