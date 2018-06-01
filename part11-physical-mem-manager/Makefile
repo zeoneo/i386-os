@@ -28,15 +28,15 @@ myos.iso: boot/stage1/boot1.bin boot/stage2/stage2.bin krnl32.bin
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 krnl32.bin: boot/kernel_entry.o ${OBJ} cpu/interrupt.o
-	i386-elf-ld -o $@ -Ttext 0x0100000 $^ --oformat binary
+	i386-elf-ld -o $@ -T kernel.ld $^ --oformat binary
 
 # Used for debugging purposes
 krnl32.elf: boot/kernel_entry.o ${OBJ} cpu/interrupt.o
-	i386-elf-ld -o $@ -Ttext 0x0100000 $^ 
+	i386-elf-ld -o $@ -T kernel.ld $^ 
 
 run: myos.iso
 	echo ${OBJ}
-	qemu-system-i386 -m 130M -fda iso/floppy.img -monitor stdio
+	qemu-system-i386 -m 250M -fda iso/floppy.img -monitor stdio
 
 vm: myos.iso
 	(killall VirtualBox && sleep 1) || true
@@ -44,7 +44,7 @@ vm: myos.iso
 
 # Open the connection to qemu and load our kernel-object file with symbols
 debug: krnl32.bin krnl32.elf
-	qemu-system-i386 -fda iso/floppy.img -boot a -s -S  -monitor stdio
+	qemu-system-i386 -fda iso/floppy.img -boot a -s -S  -monitor stdio -m 250M
 	# i386-elf-gdb -ex "target remote localhost:1234" -ex "symbol-file krnl32.elf"
 	# ndisasm -b16 -o7c00h -a -s7c3eh boot/stage1/boot1.bin
 	# ndisasm -b16 -o500h boot/stage2/stage2.bin

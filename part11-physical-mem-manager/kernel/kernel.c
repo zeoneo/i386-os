@@ -32,6 +32,8 @@ void dummy_test_entrypoint()
 {
 }
 
+extern void* kernel_end;
+
 void main(struct multiboot_info * bootinfo)
 {
     uint32_t kernelSize=0;
@@ -70,44 +72,42 @@ void main(struct multiboot_info * bootinfo)
 	asm volatile("sti");
 
 
-    DebugPrintf("pmm initialized with %i", kernelSize);
+    DebugPrintf("kernel size %i kernel_end:0x%x", kernelSize, &kernel_end);
 
     	//! get memory size in KB
   
 
 	//! initialize the physical memory manager
 	//! we place the memory bit map used by the PMM at the end of the kernel in memory
-	pmmngr_init (memSize, 0x104d80);
-
-  
-   DebugPrintf("pmm initialized with %i KB physical memory; memLo: %i memHi: %i\n\n",
-		memSize,bootinfo->m_memoryLo,bootinfo->m_memoryHi);
+	pmmngr_init (memSize, &kernel_end);
 
 	DebugSetColor (0x19);
 	DebugPrintf ("Physical Memory Map:\n");
 
 	// struct memory_region*	region = (struct memory_region*)0x1000;
 
-	// for (i=0; i<15; ++i) {
+	struct memory_region*	region = (struct memory_region*)0x1000;
 
-	// 	//! sanity check; if type is > 4 mark it reserved
-	// 	if (region[i].type>4)
-	// 		region[i].type=1;
+	for (i=0; i<15; ++i) {
 
-	// 	//! if start address is 0, there is no more entries, break out
-	// 	if (i>0 && region[i].startLo==0)
-	// 		break;
+		//! sanity check; if type is > 4 mark it reserved
+		if (region[i].type>4)
+			region[i].type=1;
 
-	// 	//! display entry
-	// 	DebugPrintf ("region %i: start: 0x%x%x length (bytes): 0x%x%x type: %i (%s)\n", i, 
-	// 		region[i].startHi, region[i].startLo,
-	// 		region[i].sizeHi,region[i].sizeLo,
-	// 		region[i].type, strMemoryTypes[region[i].type-1]);
+		//! if start address is 0, there is no more entries, break out
+		if (i>0 && region[i].startLo==0)
+			break;
 
-	// 	//! if region is avilable memory, initialize the region for use
-	// 	if (region[i].type==1)
-	// 		pmmngr_init_region (region[i].startLo, region[i].sizeLo);
-	// }
+		//! display entry
+		DebugPrintf ("region %i: start: 0x%x%x length (bytes): 0x%x%x type: %i \n", i, 
+			region[i].startHi, region[i].startLo,
+			region[i].sizeHi,region[i].sizeLo,
+			region[i].type);
+
+		//! if region is avilable memory, initialize the region for use
+		if (region[i].type==1)
+			pmmngr_init_region (region[i].startLo, region[i].sizeLo);
+	}
 
 	//! deinit the region the kernel is in as its in use
 	pmmngr_deinit_region (0x100000, kernelSize*512);
@@ -130,7 +130,9 @@ void main(struct multiboot_info * bootinfo)
 	pmmngr_free_block (p);
 	p = (uint32_t*)pmmngr_alloc_block ();
 	DebugPrintf ("\nUnallocated p to free block 1. p is reallocated to 0x%x", p);
-
+	p = (uint32_t*)pmmngr_alloc_block ();
+	DebugPrintf ("\np allocated at 0x%x", p);
+	
 	pmmngr_free_block (p);
 	pmmngr_free_blocks (p2, 2);
 
