@@ -1,0 +1,584 @@
+
+Allocating common symbols
+Common symbol       size              file
+
+idt                 0x800             kernel/kernel.o
+interrupt_handlers  0x400             cpu/isr.o
+idt_reg             0x6               kernel/kernel.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                0x00000000c0000000                . = 0xc0000000
+
+.text           0x00000000c0000000     0x3df9
+ *(.multiboot)
+ *(.text)
+ .text          0x00000000c0000000        0x7 boot/kernel_entry.o
+                0x00000000c0000000                kernel_start
+ .text          0x00000000c0000007      0x391 kernel/kernel.o
+                0x00000000c0000007                dummy_test_entrypoint
+                0x00000000c000000c                init
+                0x00000000c000032d                main
+ .text          0x00000000c0000398      0x502 kernel/mmngr_phys.o
+                0x00000000c0000398                mmap_set
+                0x00000000c00003ec                mmap_unset
+                0x00000000c0000442                mmap_test
+                0x00000000c0000485                mmap_first_free
+                0x00000000c0000525                mmap_first_free_s
+                0x00000000c0000639                pmmngr_init
+                0x00000000c000068e                pmmngr_init_region
+                0x00000000c00006d8                pmmngr_deinit_region
+                0x00000000c0000716                pmmngr_alloc_block
+                0x00000000c0000765                pmmngr_free_block
+                0x00000000c0000792                pmmngr_alloc_blocks
+                0x00000000c000080d                pmmngr_free_blocks
+                0x00000000c000085c                pmmngr_get_memory_size
+                0x00000000c0000866                pmmngr_get_block_count
+                0x00000000c0000870                pmmngr_get_use_block_count
+                0x00000000c000087a                pmmngr_get_free_block_count
+                0x00000000c0000890                pmmngr_get_block_size
+ .text          0x00000000c000089a      0x558 kernel/mmngr_virtual.o
+                0x00000000c000089a                vmmngr_ptable_lookup_entry
+                0x00000000c00008c3                vmmngr_pdirectory_lookup_entry
+                0x00000000c00008ec                paging_enable
+                0x00000000c000090c                pmmngr_is_paging
+                0x00000000c0000931                pmmngr_get_PDBR
+                0x00000000c000094e                vmmngr_switch_pdirectory
+                0x00000000c0000973                vmmngr_flush_tlb_entry
+                0x00000000c0000980                vmmngr_get_directory
+                0x00000000c000098a                vmmngr_alloc_page
+                0x00000000c00009d1                vmmngr_free_page
+                0x00000000c0000a0d                vmmngr_map_page
+                0x00000000c0000b07                page_fault
+                0x00000000c0000bd8                vmmngr_initialize
+ .text          0x00000000c0000df2      0x282 kernel/shell.o
+                0x00000000c0000df2                sleep
+                0x00000000c0000e12                getch
+                0x00000000c0000e3c                cmd
+                0x00000000c0000e50                get_cmd
+                0x00000000c0000f7c                run_cmd
+                0x00000000c0001043                run
+ .text          0x00000000c0001074       0x83 kernel/vmmngr_pde.o
+                0x00000000c0001074                pd_entry_add_attrib
+                0x00000000c0001088                pd_entry_del_attrib
+                0x00000000c000109e                pd_entry_set_frame
+                0x00000000c00010b7                pd_entry_is_present
+                0x00000000c00010c2                pd_entry_is_writable
+                0x00000000c00010cd                pd_entry_pfn
+                0x00000000c00010da                pd_entry_is_user
+                0x00000000c00010e5                pd_entry_is_4mb
+                0x00000000c00010f2                pd_entry_enable_global
+ .text          0x00000000c00010f7       0x66 kernel/vmmngr_pte.o
+                0x00000000c00010f7                pt_entry_add_attrib
+                0x00000000c000110b                pt_entry_del_attrib
+                0x00000000c0001121                pt_entry_set_frame
+                0x00000000c000113a                pt_entry_is_present
+                0x00000000c0001145                pt_entry_is_writable
+                0x00000000c0001150                pt_entry_pfn
+ .text          0x00000000c000115d       0x12 cpu/cpu.o
+                0x00000000c000115d                i86_cpu_initialize
+ .text          0x00000000c000116f      0x1f4 cpu/gdt.o
+                0x00000000c000117c                gdt_set_descriptor
+                0x00000000c000126d                i86_gdt_get_descriptor
+                0x00000000c000128a                i86_gdt_initialize
+ .text          0x00000000c0001363       0x58 cpu/hal.o
+                0x00000000c0001363                hal_initialize
+                0x00000000c0001370                disable
+                0x00000000c0001376                enable
+                0x00000000c000137c                interruptdone
+ .text          0x00000000c00013bb       0x67 cpu/idt.o
+                0x00000000c00013bb                set_idt_gate
+                0x00000000c0001402                set_idt
+ .text          0x00000000c0001422      0x5c4 cpu/isr.o
+                0x00000000c0001422                isr_install
+                0x00000000c00018e7                isr_handler
+                0x00000000c0001942                register_interrupt_handler
+                0x00000000c000195e                irq_handler
+                0x00000000c00019d1                irq_install
+ .text          0x00000000c00019e6       0x27 cpu/panic.o
+                0x00000000c00019e6                panic
+ .text          0x00000000c0001a0d      0x17c cpu/pic.o
+                0x00000000c0001a0d                i86_pic_send_command
+                0x00000000c0001a4d                i86_pic_send_data
+                0x00000000c0001a8d                i86_pic_read_data
+                0x00000000c0001ac0                i86_pic_initialize
+ .text          0x00000000c0001b89       0x91 cpu/timer.o
+                0x00000000c0001b99                init_timer
+                0x00000000c0001c10                get_timer_ticks
+ .text          0x00000000c0001c1a      0x4aa drivers/keyboard.o
+                0x00000000c0001c44                init_keyboard
+                0x00000000c0001c60                print_letter
+                0x00000000c0001c7a                print_letter2
+ .text          0x00000000c00020c4      0x63d drivers/kybrd.o
+                0x00000000c00020c4                kybrd_ctrl_read_status
+                0x00000000c00020d8                kybrd_ctrl_send_cmd
+                0x00000000c000210d                kybrd_enc_read_buf
+                0x00000000c0002121                kybrd_enc_send_cmd
+                0x00000000c0002156                i86_kybrd_irq
+                0x00000000c00023b5                kkybrd_get_scroll_lock
+                0x00000000c00023bf                kkybrd_get_numlock
+                0x00000000c00023c9                kkybrd_get_capslock
+                0x00000000c00023d3                kkybrd_get_ctrl
+                0x00000000c00023dd                kkybrd_get_alt
+                0x00000000c00023e7                kkybrd_get_shift
+                0x00000000c00023f1                kkybrd_ignore_resend
+                0x00000000c0002400                kkybrd_check_resend
+                0x00000000c000240a                kkybrd_get_diagnostic_res
+                0x00000000c0002414                kkybrd_get_bat_res
+                0x00000000c000241e                kkybrd_get_last_scan
+                0x00000000c0002428                kkybrd_set_leds
+                0x00000000c0002491                kkybrd_get_last_key
+                0x00000000c00024bd                kkybrd_discard_last_key
+                0x00000000c00024cc                kkybrd_key_to_ascii
+                0x00000000c00025e2                kkybrd_disable
+                0x00000000c0002600                kkybrd_enable
+                0x00000000c000261e                kkybrd_is_disabled
+                0x00000000c0002628                kkybrd_reset_system
+                0x00000000c0002648                kkybrd_self_test
+                0x00000000c000267c                kkybrd_install
+ .text          0x00000000c0002701       0x8d drivers/ports.o
+                0x00000000c0002701                port_byte_in
+                0x00000000c0002729                port_byte_out
+                0x00000000c0002745                port_word_in
+                0x00000000c0002770                port_word_out
+ .text          0x00000000c000278e       0x42 drivers/printk.o
+                0x00000000c000278e                printk
+ .text          0x00000000c00027d0      0x6bb drivers/screen.o
+                0x00000000c00027d0                get_screen_width
+                0x00000000c00027d7                get_screen_height
+                0x00000000c00027de                get_cursor_xy
+                0x00000000c0002918                monitor_put
+                0x00000000c0002a1b                monitor_clear
+                0x00000000c0002a6f                monitor_write
+                0x00000000c0002a95                screen_set_color
+                0x00000000c0002aab                goto_xy
+                0x00000000c0002ae1                clear_screen_with_color
+                0x00000000c0002b38                kprint_at
+                0x00000000c0002beb                kprint
+                0x00000000c0002c0e                print_char
+                0x00000000c0002cf3                get_cursor_offset
+                0x00000000c0002d4f                set_cursor_offset
+                0x00000000c0002dbd                clear_screen
+                0x00000000c0002e22                get_offset
+                0x00000000c0002e3d                get_offset_row
+                0x00000000c0002e5a                get_offset_col
+ .text          0x00000000c0002e8b      0x450 drivers/vga.o
+                0x00000000c0002e8b                vgaGraphicsModeInit
+                0x00000000c0002e9f                writeRegisters
+                0x00000000c0003078                isSupportedMode
+                0x00000000c00030a1                setMode
+                0x00000000c00030d5                getFrameBufferSegment
+                0x00000000c0003130                _putPixel
+                0x00000000c0003187                getColorIndex
+                0x00000000c0003211                putPixel
+                0x00000000c0003260                fillRectangle
+ .text          0x00000000c00032db      0x687 drivers/vsprintf.o
+                0x00000000c0003541                vsprintf
+ .text          0x00000000c0003962       0xbb libc/mem.o
+                0x00000000c0003962                memory_copy
+                0x00000000c0003992                memory_set
+                0x00000000c00039bc                memcpy
+                0x00000000c00039ee                memset
+ .text          0x00000000c0003a1d      0x1ce libc/string.o
+                0x00000000c0003a1d                int_to_ascii
+                0x00000000c0003aab                reverse
+                0x00000000c0003b0a                strlen
+                0x00000000c0003b2f                append
+                0x00000000c0003b66                backspace
+                0x00000000c0003b8a                strcmp
+ *fill*         0x00000000c0003beb        0x5 
+ .text          0x00000000c0003bf0      0x209 cpu/interrupt.o
+                0x00000000c0003c3a                isr0
+                0x00000000c0003c41                isr1
+                0x00000000c0003c48                isr2
+                0x00000000c0003c4f                isr3
+                0x00000000c0003c56                isr4
+                0x00000000c0003c5d                isr5
+                0x00000000c0003c64                isr6
+                0x00000000c0003c6b                isr7
+                0x00000000c0003c75                isr8
+                0x00000000c0003c7d                isr9
+                0x00000000c0003c87                isr10
+                0x00000000c0003c8f                isr11
+                0x00000000c0003c97                isr12
+                0x00000000c0003c9f                isr13
+                0x00000000c0003ca7                isr14
+                0x00000000c0003caf                isr15
+                0x00000000c0003cb9                isr16
+                0x00000000c0003cc3                isr17
+                0x00000000c0003ccd                isr18
+                0x00000000c0003cd7                isr19
+                0x00000000c0003ce1                isr20
+                0x00000000c0003ceb                isr21
+                0x00000000c0003cf5                isr22
+                0x00000000c0003cff                isr23
+                0x00000000c0003d09                isr24
+                0x00000000c0003d13                isr25
+                0x00000000c0003d1d                isr26
+                0x00000000c0003d27                isr27
+                0x00000000c0003d31                isr28
+                0x00000000c0003d3b                isr29
+                0x00000000c0003d45                isr30
+                0x00000000c0003d4f                isr31
+                0x00000000c0003d59                irq0
+                0x00000000c0003d63                irq1
+                0x00000000c0003d6d                irq2
+                0x00000000c0003d77                irq3
+                0x00000000c0003d81                irq4
+                0x00000000c0003d8b                irq5
+                0x00000000c0003d95                irq6
+                0x00000000c0003d9f                irq7
+                0x00000000c0003da9                irq8
+                0x00000000c0003db3                irq9
+                0x00000000c0003dbd                irq10
+                0x00000000c0003dc7                irq11
+                0x00000000c0003dd1                irq12
+                0x00000000c0003ddb                irq13
+                0x00000000c0003de5                irq14
+                0x00000000c0003def                irq15
+
+.rodata         0x00000000c0004000      0x91c
+ *(.rodata)
+ .rodata        0x00000000c0004000      0x250 kernel/kernel.o
+ .rodata        0x00000000c0004250       0x6a kernel/mmngr_virtual.o
+ *fill*         0x00000000c00042ba        0x2 
+ .rodata        0x00000000c00042bc       0xe4 kernel/shell.o
+ .rodata        0x00000000c00043a0      0x153 cpu/isr.o
+ .rodata        0x00000000c00044f3       0x1b cpu/panic.o
+ *fill*         0x00000000c000450e        0x2 
+ .rodata        0x00000000c0004510      0x1c4 drivers/keyboard.o
+ .rodata        0x00000000c00046d4      0x130 drivers/kybrd.o
+                0x00000000c00046d4                INVALID_SCANCODE
+ .rodata        0x00000000c0004804      0x118 drivers/vsprintf.o
+
+.eh_frame       0x00000000c000491c     0x15ec
+ .eh_frame      0x00000000c000491c       0x84 kernel/kernel.o
+ .eh_frame      0x00000000c00049a0      0x264 kernel/mmngr_phys.o
+ .eh_frame      0x00000000c0004c04      0x1c0 kernel/mmngr_virtual.o
+ .eh_frame      0x00000000c0004dc4       0xd8 kernel/shell.o
+ .eh_frame      0x00000000c0004e9c      0x138 kernel/vmmngr_pde.o
+ .eh_frame      0x00000000c0004fd4       0xd8 kernel/vmmngr_pte.o
+ .eh_frame      0x00000000c00050ac       0x38 cpu/cpu.o
+ .eh_frame      0x00000000c00050e4       0x98 cpu/gdt.o
+ .eh_frame      0x00000000c000517c       0x98 cpu/hal.o
+ .eh_frame      0x00000000c0005214       0x58 cpu/idt.o
+ .eh_frame      0x00000000c000526c       0xc4 cpu/isr.o
+ .eh_frame      0x00000000c0005330       0x34 cpu/panic.o
+ .eh_frame      0x00000000c0005364       0x98 cpu/pic.o
+ .eh_frame      0x00000000c00053fc       0x78 cpu/timer.o
+ .eh_frame      0x00000000c0005474       0x98 drivers/keyboard.o
+ .eh_frame      0x00000000c000550c      0x358 drivers/kybrd.o
+ .eh_frame      0x00000000c0005864       0xa0 drivers/ports.o
+ .eh_frame      0x00000000c0005904       0x38 drivers/printk.o
+ .eh_frame      0x00000000c000593c      0x298 drivers/screen.o
+ .eh_frame      0x00000000c0005bd4      0x140 drivers/vga.o
+ .eh_frame      0x00000000c0005d14       0x80 drivers/vsprintf.o
+ .eh_frame      0x00000000c0005d94       0x98 libc/mem.o
+ .eh_frame      0x00000000c0005e2c       0xdc libc/string.o
+
+.data           0x00000000c0006000      0x23d
+ *(.data)
+ .data          0x00000000c0006000       0x10 kernel/kernel.o
+                0x00000000c0006000                strMemoryTypes
+ .data          0x00000000c0006010        0x0 kernel/mmngr_phys.o
+ .data          0x00000000c0006010        0x0 kernel/mmngr_virtual.o
+ .data          0x00000000c0006010        0x0 kernel/shell.o
+ .data          0x00000000c0006010        0x0 kernel/vmmngr_pde.o
+ .data          0x00000000c0006010        0x0 kernel/vmmngr_pte.o
+ .data          0x00000000c0006010        0x0 cpu/cpu.o
+ .data          0x00000000c0006010        0x0 cpu/gdt.o
+ .data          0x00000000c0006010        0x0 cpu/hal.o
+ .data          0x00000000c0006010        0x0 cpu/idt.o
+ *fill*         0x00000000c0006010       0x10 
+ .data          0x00000000c0006020       0x80 cpu/isr.o
+                0x00000000c0006020                exception_messages
+ .data          0x00000000c00060a0        0x0 cpu/panic.o
+ .data          0x00000000c00060a0        0x0 cpu/pic.o
+ .data          0x00000000c00060a0        0x0 cpu/timer.o
+ .data          0x00000000c00060a0        0x0 drivers/keyboard.o
+ .data          0x00000000c00060a0      0x14c drivers/kybrd.o
+ .data          0x00000000c00061ec        0x0 drivers/ports.o
+ .data          0x00000000c00061ec        0x0 drivers/printk.o
+ .data          0x00000000c00061ec        0x4 drivers/screen.o
+                0x00000000c00061ec                video_memory
+ *fill*         0x00000000c00061f0       0x10 
+ .data          0x00000000c0006200       0x3d drivers/vga.o
+                0x00000000c0006200                g_320x200x256
+ .data          0x00000000c000623d        0x0 drivers/vsprintf.o
+ .data          0x00000000c000623d        0x0 libc/mem.o
+ .data          0x00000000c000623d        0x0 libc/string.o
+
+.bss            0x00000000c0007000     0x1103
+ *(COMMON)
+ COMMON         0x00000000c0007000      0x806 kernel/kernel.o
+                0x00000000c0007000                idt
+                0x00000000c0007800                idt_reg
+ *fill*         0x00000000c0007806       0x1a 
+ COMMON         0x00000000c0007820      0x400 cpu/isr.o
+                0x00000000c0007820                interrupt_handlers
+ *(.bss)
+ .bss           0x00000000c0007c20        0x0 kernel/kernel.o
+ .bss           0x00000000c0007c20       0x10 kernel/mmngr_phys.o
+ .bss           0x00000000c0007c30        0x8 kernel/mmngr_virtual.o
+                0x00000000c0007c30                _cur_directory
+                0x00000000c0007c34                _cur_pdbr
+ *fill*         0x00000000c0007c38        0x8 
+ .bss           0x00000000c0007c40       0x64 kernel/shell.o
+ .bss           0x00000000c0007ca4        0x0 kernel/vmmngr_pde.o
+ .bss           0x00000000c0007ca4        0x0 kernel/vmmngr_pte.o
+ .bss           0x00000000c0007ca4        0x0 cpu/cpu.o
+ .bss           0x00000000c0007ca4       0x20 cpu/gdt.o
+ .bss           0x00000000c0007cc4        0x0 cpu/hal.o
+ .bss           0x00000000c0007cc4        0x0 cpu/idt.o
+ .bss           0x00000000c0007cc4        0x0 cpu/isr.o
+ .bss           0x00000000c0007cc4        0x0 cpu/panic.o
+ .bss           0x00000000c0007cc4        0x0 cpu/pic.o
+ .bss           0x00000000c0007cc4        0x4 cpu/timer.o
+                0x00000000c0007cc4                tick
+ .bss           0x00000000c0007cc8        0x0 drivers/keyboard.o
+ .bss           0x00000000c0007cc8       0x34 drivers/kybrd.o
+ .bss           0x00000000c0007cfc        0x0 drivers/ports.o
+ *fill*         0x00000000c0007cfc        0x4 
+ .bss           0x00000000c0007d00      0x400 drivers/printk.o
+ .bss           0x00000000c0008100        0x3 drivers/screen.o
+                0x00000000c0008100                cursor_x
+                0x00000000c0008101                cursor_y
+                0x00000000c0008102                text_color
+ .bss           0x00000000c0008103        0x0 drivers/vga.o
+ .bss           0x00000000c0008103        0x0 drivers/vsprintf.o
+ .bss           0x00000000c0008103        0x0 libc/mem.o
+ .bss           0x00000000c0008103        0x0 libc/string.o
+                0x00000000c0009000                kernel_end = ALIGN (0x1000)
+LOAD boot/kernel_entry.o
+LOAD kernel/kernel.o
+LOAD kernel/mmngr_phys.o
+LOAD kernel/mmngr_virtual.o
+LOAD kernel/shell.o
+LOAD kernel/vmmngr_pde.o
+LOAD kernel/vmmngr_pte.o
+LOAD cpu/cpu.o
+LOAD cpu/gdt.o
+LOAD cpu/hal.o
+LOAD cpu/idt.o
+LOAD cpu/isr.o
+LOAD cpu/panic.o
+LOAD cpu/pic.o
+LOAD cpu/timer.o
+LOAD drivers/keyboard.o
+LOAD drivers/kybrd.o
+LOAD drivers/ports.o
+LOAD drivers/printk.o
+LOAD drivers/screen.o
+LOAD drivers/vga.o
+LOAD drivers/vsprintf.o
+LOAD libc/mem.o
+LOAD libc/string.o
+LOAD cpu/interrupt.o
+OUTPUT(krnl32.bin binary)
+
+.debug_info     0x0000000000000000     0x47be
+ .debug_info    0x0000000000000000      0x4e5 kernel/kernel.o
+ .debug_info    0x00000000000004e5      0x4c8 kernel/mmngr_phys.o
+ .debug_info    0x00000000000009ad      0x77c kernel/mmngr_virtual.o
+ .debug_info    0x0000000000001129      0x5a1 kernel/shell.o
+ .debug_info    0x00000000000016ca      0x283 kernel/vmmngr_pde.o
+ .debug_info    0x000000000000194d      0x206 kernel/vmmngr_pte.o
+ .debug_info    0x0000000000001b53       0x85 cpu/cpu.o
+ .debug_info    0x0000000000001bd8      0x227 cpu/gdt.o
+ .debug_info    0x0000000000001dff      0x1d4 cpu/hal.o
+ .debug_info    0x0000000000001fd3      0x17f cpu/idt.o
+ .debug_info    0x0000000000002152      0x36e cpu/isr.o
+ .debug_info    0x00000000000024c0       0x61 cpu/panic.o
+ .debug_info    0x0000000000002521      0x26d cpu/pic.o
+ .debug_info    0x000000000000278e      0x1fc cpu/timer.o
+ .debug_info    0x000000000000298a      0x212 drivers/keyboard.o
+ .debug_info    0x0000000000002b9c      0xc33 drivers/kybrd.o
+ .debug_info    0x00000000000037cf      0x114 drivers/ports.o
+ .debug_info    0x00000000000038e3       0xcc drivers/printk.o
+ .debug_info    0x00000000000039af      0x501 drivers/screen.o
+ .debug_info    0x0000000000003eb0      0x2f2 drivers/vga.o
+ .debug_info    0x00000000000041a2      0x258 drivers/vsprintf.o
+ .debug_info    0x00000000000043fa      0x202 libc/mem.o
+ .debug_info    0x00000000000045fc      0x1c2 libc/string.o
+
+.debug_abbrev   0x0000000000000000     0x183f
+ .debug_abbrev  0x0000000000000000      0x160 kernel/kernel.o
+ .debug_abbrev  0x0000000000000160      0x158 kernel/mmngr_phys.o
+ .debug_abbrev  0x00000000000002b8      0x220 kernel/mmngr_virtual.o
+ .debug_abbrev  0x00000000000004d8      0x141 kernel/shell.o
+ .debug_abbrev  0x0000000000000619       0xc4 kernel/vmmngr_pde.o
+ .debug_abbrev  0x00000000000006dd       0xc6 kernel/vmmngr_pte.o
+ .debug_abbrev  0x00000000000007a3       0x42 cpu/cpu.o
+ .debug_abbrev  0x00000000000007e5      0x115 cpu/gdt.o
+ .debug_abbrev  0x00000000000008fa      0x110 cpu/hal.o
+ .debug_abbrev  0x0000000000000a0a       0xf1 cpu/idt.o
+ .debug_abbrev  0x0000000000000afb      0x14b cpu/isr.o
+ .debug_abbrev  0x0000000000000c46       0x58 cpu/panic.o
+ .debug_abbrev  0x0000000000000c9e      0x106 cpu/pic.o
+ .debug_abbrev  0x0000000000000da4       0xf7 cpu/timer.o
+ .debug_abbrev  0x0000000000000e9b      0x10c drivers/keyboard.o
+ .debug_abbrev  0x0000000000000fa7      0x1e3 drivers/kybrd.o
+ .debug_abbrev  0x000000000000118a       0x8b drivers/ports.o
+ .debug_abbrev  0x0000000000001215       0xb0 drivers/printk.o
+ .debug_abbrev  0x00000000000012c5      0x1fc drivers/screen.o
+ .debug_abbrev  0x00000000000014c1      0x110 drivers/vga.o
+ .debug_abbrev  0x00000000000015d1       0xec drivers/vsprintf.o
+ .debug_abbrev  0x00000000000016bd       0xd2 libc/mem.o
+ .debug_abbrev  0x000000000000178f       0xb0 libc/string.o
+
+.debug_loc      0x0000000000000000     0x21c4
+ .debug_loc     0x0000000000000000       0x9c kernel/kernel.o
+ .debug_loc     0x000000000000009c      0x3b8 kernel/mmngr_phys.o
+ .debug_loc     0x0000000000000454      0x2cc kernel/mmngr_virtual.o
+ .debug_loc     0x0000000000000720      0x150 kernel/shell.o
+ .debug_loc     0x0000000000000870      0x1f8 kernel/vmmngr_pde.o
+ .debug_loc     0x0000000000000a68      0x150 kernel/vmmngr_pte.o
+ .debug_loc     0x0000000000000bb8       0x38 cpu/cpu.o
+ .debug_loc     0x0000000000000bf0       0xe0 cpu/gdt.o
+ .debug_loc     0x0000000000000cd0       0xe0 cpu/hal.o
+ .debug_loc     0x0000000000000db0       0x70 cpu/idt.o
+ .debug_loc     0x0000000000000e20      0x118 cpu/isr.o
+ .debug_loc     0x0000000000000f38       0x2c cpu/panic.o
+ .debug_loc     0x0000000000000f64       0xe0 cpu/pic.o
+ .debug_loc     0x0000000000001044       0xa8 cpu/timer.o
+ .debug_loc     0x00000000000010ec       0xe0 drivers/keyboard.o
+ .debug_loc     0x00000000000011cc      0x5b0 drivers/kybrd.o
+ .debug_loc     0x000000000000177c       0xe0 drivers/ports.o
+ .debug_loc     0x000000000000185c       0x38 drivers/printk.o
+ .debug_loc     0x0000000000001894      0x460 drivers/screen.o
+ .debug_loc     0x0000000000001cf4      0x1f8 drivers/vga.o
+ .debug_loc     0x0000000000001eec       0xa8 drivers/vsprintf.o
+ .debug_loc     0x0000000000001f94       0xe0 libc/mem.o
+ .debug_loc     0x0000000000002074      0x150 libc/string.o
+
+.debug_aranges  0x0000000000000000      0x2e0
+ .debug_aranges
+                0x0000000000000000       0x20 kernel/kernel.o
+ .debug_aranges
+                0x0000000000000020       0x20 kernel/mmngr_phys.o
+ .debug_aranges
+                0x0000000000000040       0x20 kernel/mmngr_virtual.o
+ .debug_aranges
+                0x0000000000000060       0x20 kernel/shell.o
+ .debug_aranges
+                0x0000000000000080       0x20 kernel/vmmngr_pde.o
+ .debug_aranges
+                0x00000000000000a0       0x20 kernel/vmmngr_pte.o
+ .debug_aranges
+                0x00000000000000c0       0x20 cpu/cpu.o
+ .debug_aranges
+                0x00000000000000e0       0x20 cpu/gdt.o
+ .debug_aranges
+                0x0000000000000100       0x20 cpu/hal.o
+ .debug_aranges
+                0x0000000000000120       0x20 cpu/idt.o
+ .debug_aranges
+                0x0000000000000140       0x20 cpu/isr.o
+ .debug_aranges
+                0x0000000000000160       0x20 cpu/panic.o
+ .debug_aranges
+                0x0000000000000180       0x20 cpu/pic.o
+ .debug_aranges
+                0x00000000000001a0       0x20 cpu/timer.o
+ .debug_aranges
+                0x00000000000001c0       0x20 drivers/keyboard.o
+ .debug_aranges
+                0x00000000000001e0       0x20 drivers/kybrd.o
+ .debug_aranges
+                0x0000000000000200       0x20 drivers/ports.o
+ .debug_aranges
+                0x0000000000000220       0x20 drivers/printk.o
+ .debug_aranges
+                0x0000000000000240       0x20 drivers/screen.o
+ .debug_aranges
+                0x0000000000000260       0x20 drivers/vga.o
+ .debug_aranges
+                0x0000000000000280       0x20 drivers/vsprintf.o
+ .debug_aranges
+                0x00000000000002a0       0x20 libc/mem.o
+ .debug_aranges
+                0x00000000000002c0       0x20 libc/string.o
+
+.debug_ranges   0x0000000000000000       0x30
+ .debug_ranges  0x0000000000000000       0x18 kernel/kernel.o
+ .debug_ranges  0x0000000000000018       0x18 kernel/mmngr_virtual.o
+
+.debug_line     0x0000000000000000     0x14da
+ .debug_line    0x0000000000000000      0x115 kernel/kernel.o
+ .debug_line    0x0000000000000115      0x1a1 kernel/mmngr_phys.o
+ .debug_line    0x00000000000002b6      0x1ec kernel/mmngr_virtual.o
+ .debug_line    0x00000000000004a2       0xbb kernel/shell.o
+ .debug_line    0x000000000000055d       0xb6 kernel/vmmngr_pde.o
+ .debug_line    0x0000000000000613       0xb0 kernel/vmmngr_pte.o
+ .debug_line    0x00000000000006c3       0x3a cpu/cpu.o
+ .debug_line    0x00000000000006fd       0xad cpu/gdt.o
+ .debug_line    0x00000000000007aa       0x5e cpu/hal.o
+ .debug_line    0x0000000000000808       0x57 cpu/idt.o
+ .debug_line    0x000000000000085f       0xea cpu/isr.o
+ .debug_line    0x0000000000000949       0x41 cpu/panic.o
+ .debug_line    0x000000000000098a       0xf4 cpu/pic.o
+ .debug_line    0x0000000000000a7e       0x65 cpu/timer.o
+ .debug_line    0x0000000000000ae3       0xf2 drivers/keyboard.o
+ .debug_line    0x0000000000000bd5      0x207 drivers/kybrd.o
+ .debug_line    0x0000000000000ddc       0x50 drivers/ports.o
+ .debug_line    0x0000000000000e2c       0x7a drivers/printk.o
+ .debug_line    0x0000000000000ea6      0x17a drivers/screen.o
+ .debug_line    0x0000000000001020      0x153 drivers/vga.o
+ .debug_line    0x0000000000001173      0x1ee drivers/vsprintf.o
+ .debug_line    0x0000000000001361       0xcd libc/mem.o
+ .debug_line    0x000000000000142e       0xac libc/string.o
+
+.debug_str      0x0000000000000000     0x37db
+ .debug_str     0x0000000000000000      0x3ef kernel/kernel.o
+ .debug_str     0x00000000000003ef      0x2dd kernel/mmngr_phys.o
+ .debug_str     0x00000000000006cc      0x4bb kernel/mmngr_virtual.o
+ .debug_str     0x0000000000000b87      0x614 kernel/shell.o
+ .debug_str     0x000000000000119b      0x274 kernel/vmmngr_pde.o
+ .debug_str     0x000000000000140f      0x24e kernel/vmmngr_pte.o
+ .debug_str     0x000000000000165d       0xf4 cpu/cpu.o
+ .debug_str     0x0000000000001751      0x1bf cpu/gdt.o
+ .debug_str     0x0000000000001910      0x186 cpu/hal.o
+ .debug_str     0x0000000000001a96      0x112 cpu/idt.o
+ .debug_str     0x0000000000001ba8      0x19f cpu/isr.o
+ .debug_str     0x0000000000001d47       0x6a cpu/panic.o
+ .debug_str     0x0000000000001db1      0x1ad cpu/pic.o
+ .debug_str     0x0000000000001f5e      0x10d cpu/timer.o
+ .debug_str     0x000000000000206b      0x12d drivers/keyboard.o
+ .debug_str     0x0000000000002198      0xe95 drivers/kybrd.o
+ .debug_str     0x000000000000302d       0xcb drivers/ports.o
+ .debug_str     0x00000000000030f8       0xa7 drivers/printk.o
+ .debug_str     0x000000000000319f      0x238 drivers/screen.o
+ .debug_str     0x00000000000033d7      0x15b drivers/vga.o
+ .debug_str     0x0000000000003532      0x10a drivers/vsprintf.o
+ .debug_str     0x000000000000363c      0x100 libc/mem.o
+ .debug_str     0x000000000000373c       0x9f libc/string.o
+
+.comment        0x0000000000000000      0x19e
+ .comment       0x0000000000000000       0x12 kernel/kernel.o
+ .comment       0x0000000000000012       0x12 kernel/mmngr_phys.o
+ .comment       0x0000000000000024       0x12 kernel/mmngr_virtual.o
+ .comment       0x0000000000000036       0x12 kernel/shell.o
+ .comment       0x0000000000000048       0x12 kernel/vmmngr_pde.o
+ .comment       0x000000000000005a       0x12 kernel/vmmngr_pte.o
+ .comment       0x000000000000006c       0x12 cpu/cpu.o
+ .comment       0x000000000000007e       0x12 cpu/gdt.o
+ .comment       0x0000000000000090       0x12 cpu/hal.o
+ .comment       0x00000000000000a2       0x12 cpu/idt.o
+ .comment       0x00000000000000b4       0x12 cpu/isr.o
+ .comment       0x00000000000000c6       0x12 cpu/panic.o
+ .comment       0x00000000000000d8       0x12 cpu/pic.o
+ .comment       0x00000000000000ea       0x12 cpu/timer.o
+ .comment       0x00000000000000fc       0x12 drivers/keyboard.o
+ .comment       0x000000000000010e       0x12 drivers/kybrd.o
+ .comment       0x0000000000000120       0x12 drivers/ports.o
+ .comment       0x0000000000000132       0x12 drivers/printk.o
+ .comment       0x0000000000000144       0x12 drivers/screen.o
+ .comment       0x0000000000000156       0x12 drivers/vga.o
+ .comment       0x0000000000000168       0x12 drivers/vsprintf.o
+ .comment       0x000000000000017a       0x12 libc/mem.o
+ .comment       0x000000000000018c       0x12 libc/string.o
