@@ -1,6 +1,10 @@
 #include "common.h"
 #include "mmngr_virtual.h"
 #include "mmngr_phys.h"
+#include "../drivers/printk.h"
+#include "../cpu/idt.h"
+#include "../cpu/panic.h"
+
 
 //============================================================================
 //    IMPLEMENTATION PRIVATE DEFINITIONS / ENUMERATIONS / SIMPLE TYPEDEFS
@@ -15,18 +19,14 @@
 //! page sizes are 4k
 #define PAGE_SIZE 4096
 
-//============================================================================
-//    IMPLEMENTATION PRIVATE CLASS PROTOTYPES / EXTERNAL CLASS REFERENCES
-//============================================================================
-//============================================================================
-//    IMPLEMENTATION PRIVATE STRUCTURES / UTILITY CLASSES
-//============================================================================
-//============================================================================
-//    IMPLEMENTATION REQUIRED EXTERNAL REFERENCES (AVOID)
-//============================================================================
-//============================================================================
-//    IMPLEMENTATION PRIVATE DATA
-//============================================================================
+
+typedef struct
+{
+  uint32_t ds;             // Data segment selector.
+  uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed by pusha.
+  uint32_t int_no, err_code; // Interrupt number and error code (if applicable).
+  uint32_t eip, cs, eflags, useresp, ss; // Pushed by the processor automatically.
+} registers_t;
 
 //! current directory table
 struct pdirectory*		_cur_directory=0;
@@ -34,18 +34,6 @@ struct pdirectory*		_cur_directory=0;
 //! current page directory base register
 physical_addr	_cur_pdbr=0;
 
-//============================================================================
-//    INTERFACE DATA
-//============================================================================
-//============================================================================
-//    IMPLEMENTATION PRIVATE FUNCTION PROTOTYPES
-//============================================================================
-//============================================================================
-//    IMPLEMENTATION PRIVATE FUNCTIONS
-//============================================================================
-//============================================================================
-//    INTERFACE FUNCTIONS
-//============================================================================
 
 inline pt_entry* vmmngr_ptable_lookup_entry (struct ptable* p,virtual_addr addr) {
 
@@ -61,25 +49,41 @@ inline pd_entry* vmmngr_pdirectory_lookup_entry (struct pdirectory* p, virtual_a
 	return 0;
 }
 
+inline void paging_enable () {
+	uint32_t cr0;
+	asm volatile ("mov %%cr0, %0" : "=r" (cr0));
+  	cr0 |= 0x80000000;
+  	asm volatile ("mov %0, %%cr0" : : "r" (cr0));
+}
+
+inline int pmmngr_is_paging () {
+	uint32_t res=0;
+	asm volatile ("mov %%cr0, %0" : "=r" (res));
+	return (res & 0x80000000) ? 0 : 1;
+}
+
+physical_addr pmmngr_get_PDBR () {
+    uint32_t res=0;
+	asm volatile ("mov %%cr3, %0" : "=r" (res));
+    return res;
+}
+
 inline int vmmngr_switch_pdirectory (struct pdirectory* dir) {
 
 	if (!dir)
 		return 0;
 
 	_cur_directory = dir;
-	pmmngr_load_PDBR (_cur_pdbr);
+    asm volatile ("mov %0, %%cr3" : : "r" (dir));
+
 	return 1;
 }
 
 void vmmngr_flush_tlb_entry (virtual_addr addr) {
-
-#ifdef _MSC_VER
-	_asm {
-		cli
-		invlpg	addr
-		sti
-	}
-#endif
+  // Inform the CPU that we have invalidated a page mapping.
+  asm volatile("cli");
+  asm volatile ("invlpg (%0)" : : "a" (addr));
+  asm volatile("sti");
 }
 
 struct pdirectory* vmmngr_get_directory () {
@@ -149,6 +153,31 @@ void vmmngr_map_page (void* phys, void* virt) {
    pt_entry_add_attrib ( page, I86_PTE_PRESENT);
 }
 
+void page_fault (registers_t regs)
+{
+  uint32_t cr2;
+  asm volatile ("mov %%cr2, %0" : "=r" (cr2));
+
+   int present   = !(regs.err_code & 0x1); // Page not present
+   int rw = regs.err_code & 0x2;           // Write operation?
+   int us = regs.err_code & 0x4;           // Processor was in user-mode?
+   int reserved = regs.err_code & 0x8;     // Overwritten CPU-reserved bits of page entry?
+   int id = regs.err_code & 0x10;  
+
+    printk ("Page fault at 0x%x, faulting address 0x%x\n", regs.eip, cr2);
+    printk ("Error code: %x", regs.err_code);
+  
+    if (present) {printk(" present ");}
+    if (rw) {printk(" read-only ");}
+    if (us) {printk(" user-mode ");}
+    if (reserved) {printk(" reserved ");}
+
+    printk("\n");
+    panic ("");
+  for (;;) ;
+}
+
+
 void vmmngr_initialize () {
     int i;
     int frame;
@@ -212,12 +241,16 @@ void vmmngr_initialize () {
    //! store current PDBR
    _cur_pdbr = (physical_addr) &dir->m_entries;
 
+    //Register Page Fault Handler
+    set_idt_gate(14, &page_fault);
+
    //! switch to our page directory
    vmmngr_switch_pdirectory (dir);
 
    //! enable paging
-   pmmngr_paging_enable (1);
+   paging_enable();
 }
+
 
 //============================================================================
 //    INTERFACE CLASS BODIES

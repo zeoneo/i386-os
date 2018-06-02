@@ -262,30 +262,13 @@ uint32_t pmmngr_get_use_block_count () {
 }
 
 uint32_t pmmngr_get_free_block_count () {
-
 	return _mmngr_max_blocks - _mmngr_used_blocks;
 }
 
 uint32_t pmmngr_get_block_size () {
-
 	return PMMNGR_BLOCK_SIZE;
 }
 
-void	pmmngr_paging_enable (int b) {
-}
-
-int pmmngr_is_paging () {
-
-	uint32_t res=0;
-	return (res & 0x80000000) ? 0 : 1;
-}
-
-void pmmngr_load_PDBR (physical_addr addr) {
-}
-
-physical_addr pmmngr_get_PDBR () {
-
-}
 
 //============================================================================
 //    INTERFACE CLASS BODIES

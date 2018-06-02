@@ -38,6 +38,7 @@ run: myos.iso
 	echo ${OBJ}
 	qemu-system-i386 -m 250M -fda iso/floppy.img -monitor stdio
 
+
 vm: myos.iso
 	(killall VirtualBox && sleep 1) || true
 	virtualBox --startvm "myos" &
@@ -45,7 +46,7 @@ debug-vm: myos.iso
 	(killall VirtualBox && sleep 1) || true
 	virtualBox --dbg --startvm "myos"
 # Open the connection to qemu and load our kernel-object file with symbols
-debug: myos.iso
+debug: krnl32.elf krnl32.bin myos.iso 
 	qemu-system-i386 -fda iso/floppy.img -boot a -s -S  -monitor stdio -m 250M
 	# i386-elf-gdb -ex "target remote localhost:1234" -ex "symbol-file krnl32.elf"
 	# ndisasm -b16 -o7c00h -a -s7c3eh boot/stage1/boot1.bin
@@ -54,6 +55,7 @@ debug: myos.iso
 # To make an object, always compile from its .c
 %.o: %.c ${HEADERS}
 	${CC} ${CFLAGS} -ffreestanding -c $< -o $@
+
 %.o: %.s
 	nasm $< -f elf -o $@
 

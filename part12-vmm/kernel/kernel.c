@@ -120,6 +120,9 @@ void main(struct multiboot_info * bootinfo)
 	//! initialize our vmm
 	vmmngr_initialize ();
 
+	unsigned int *ptr = (unsigned int*)0xA0000321;
+   	unsigned int do_page_fault = *ptr;
+
 	while(1);
 
 	uint32_t* p = (uint32_t*)pmmngr_alloc_block ();

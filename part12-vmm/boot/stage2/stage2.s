@@ -28,7 +28,8 @@ jmp	main				; go to start
 ;	Data Section
 ;*******************************************************
 
-msgFailure db 0x0D, 0x0A, "Failed", 0x00
+msgFailure db 0x0D, 0x0A, "Failed to find KRNL32", 0x00
+MSG db 0x0D, 0x0A, "No kernel 1", 0x00
 welcomeMessage db 0x0D, 0x0A, "Landed in STAGE TWO...", 0x00
 enableA20Msg db 0x0D, 0x0A, "Enable A20 Installed GDT", 0x00
 ImageName     db "KRNL32  BIN"
@@ -115,7 +116,6 @@ main:
 	jmp $;
 
 EnterStage3:
-
 	cli	                           ; clear interrupts
 	mov	eax, cr0                   ; set bit 0 in cr0--enter pmode
 	or	eax, 1
@@ -147,27 +147,31 @@ Stage3:
 	mov	es, ax
 	mov	esp, 90000h		; stack begins from 90000h
 
+
+	mov		ebx, MSG
+	call   	Puts32
+
 	; call	ClrScr32
 	call	EnablePaging
 
 CopyImage:
-  	 mov	eax, dword [ImageSize]
-  	 movzx	ebx, word [bpbBytesPerSector]
-  	 mul	ebx
-  	 mov	ebx, 4
-	 mov 	edx, 0x0000
-  	 div	ebx
-   	 cld
-   	 mov    esi, IMAGE_RMODE_BASE
-   	 mov	edi, IMAGE_PMODE_BASE
-   	 mov	ecx, eax
-   	 rep	movsd                   ; copy image to its protected mode address
-	 mov	eax, 0x2BADB002		; multiboot specs say eax should be this
-	 mov	ebx, 0
-	 mov edx, [ImageSize]
-	 push	dword boot_info
+	mov	eax, dword [ImageSize]
+	movzx	ebx, word [bpbBytesPerSector]
+	mul	ebx
+	mov	ebx, 4
+	mov 	edx, 0x0000
+	div	ebx
+	cld
+	mov    esi, IMAGE_RMODE_BASE
+	mov	edi, IMAGE_PMODE_BASE
+	mov	ecx, eax
+	rep	movsd                   ; copy image to its protected mode address
+	mov	eax, 0x2BADB002		; multiboot specs say eax should be this
+	mov	ebx, 0
+	mov edx, [ImageSize]
+	push	dword boot_info
 
-	 mov eax, 0x10  ; Load data segment selector for KM Data Segment descriptor
+	mov eax, 0x10  ; Load data segment selector for KM Data Segment descriptor
   	mov ds, eax     ; Load data segment selector registers
  	mov  es, eax
   	mov fs, eax

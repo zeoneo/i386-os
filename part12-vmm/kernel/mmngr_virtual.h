@@ -48,12 +48,6 @@ struct pdirectory {
 	pd_entry m_entries[PAGES_PER_DIR];
 };
 
-//============================================================================
-//    INTERFACE DATA DECLARATIONS
-//============================================================================
-//============================================================================
-//    INTERFACE FUNCTION PROTOTYPES
-//============================================================================
 
 //! maps phys to virtual address
 extern void MmMapPage (void* phys, void* virt);
@@ -68,7 +62,7 @@ extern int vmmngr_alloc_page (pt_entry*);
 extern void vmmngr_free_page (pt_entry* e);
 
 //! switch to a new page directory
-extern int vmmngr_switch_pdirectory (struct pdirectory*);
+extern int vmmngr_switch_pdirectory(struct pdirectory* dir);
 
 //! get current page directory
 extern struct pdirectory* vmmngr_get_directory ();
@@ -93,17 +87,5 @@ extern void vmmngr_pdirectory_clear (struct pdirectory* dir);
 
 //! get directory entry from directory table
 extern pd_entry* vmmngr_pdirectory_lookup_entry (struct pdirectory* p, virtual_addr addr);
-
-//============================================================================
-//    INTERFACE OBJECT CLASS DEFINITIONS
-//============================================================================
-//============================================================================
-//    INTERFACE TRAILING HEADERS
-//============================================================================
-//****************************************************************************
-//**
-//**    END [mmngr_virtual.h]
-//**
-//****************************************************************************
 
 #endif
