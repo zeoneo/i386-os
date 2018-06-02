@@ -45,12 +45,12 @@ void main(struct multiboot_info * bootinfo)
     uint32_t memSize = 1024 + bootinfo->m_memoryLo + bootinfo->m_memoryHi*64;
     int i;
 
-
+		asm volatile("cli");
 	
     clear_screen_with_color (0x13);
 	goto_xy (0,0);
-	screen_set_color (0x3F);
-	printk ("                    ~[ Physical Memory Manager Demo ]~                          ");
+	screen_set_color (0x17);
+	printk ("Zeus is loading...\n");
 	goto_xy (0,24);
 	screen_set_color (0x3F);
 	printk ("                                                                                ");
@@ -115,6 +115,12 @@ void main(struct multiboot_info * bootinfo)
 	//! allocating and deallocating memory examples...
 
 	screen_set_color (0x12);
+
+	
+	//! initialize our vmm
+	vmmngr_initialize ();
+
+	while(1);
 
 	uint32_t* p = (uint32_t*)pmmngr_alloc_block ();
 	printk ("\np allocated at 0x%x", p);

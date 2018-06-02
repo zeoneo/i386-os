@@ -33,7 +33,7 @@ welcomeMessage db 0x0D, 0x0A, "Landed in STAGE TWO...", 0x00
 enableA20Msg db 0x0D, 0x0A, "Enable A20 Installed GDT", 0x00
 ImageName     db "KRNL32  BIN"
 ImageSize     db 0
-IMAGE_PMODE_BASE equ 0x0100000
+
 IMAGE_RMODE_BASE equ 0x7E00
 
 boot_info:
@@ -131,6 +131,7 @@ EnterStage3:
 ;******************************************************
 
 [bits 32]
+%include "boot/stage2/paging.s"
 
 BadImage db "*** FATAL: Invalid or corrupt kernel image. Halting system.", 0
 
@@ -147,6 +148,7 @@ Stage3:
 	mov	esp, 90000h		; stack begins from 90000h
 
 	; call	ClrScr32
+	call	EnablePaging
 
 CopyImage:
   	 mov	eax, dword [ImageSize]
@@ -171,7 +173,7 @@ CopyImage:
   	mov fs, eax
   	mov gs, eax
   	mov ss, eax
-	 jmp IMAGE_PMODE_BASE
+	jmp IMAGE_PMODE_BASE
 
     cli
 	hlt
