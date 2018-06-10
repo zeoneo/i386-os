@@ -127,7 +127,7 @@ void i86_pic_initialize (uint8_t base0, uint8_t base1) {
 	uint8_t		icw	= 0;
 
 	//! disable hardware interrupts
-	disable ();
+	disable_interrupts ();
 
 	//! Begin initialization of PIC
 

@@ -5,4 +5,5 @@
 
 void init_timer(unsigned int freq);
 unsigned int get_timer_ticks();
+void sleep (unsigned int ms);
 #endif

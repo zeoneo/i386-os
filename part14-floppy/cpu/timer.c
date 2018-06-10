@@ -1,16 +1,26 @@
 #include "./isr.h"
 #include "./timer.h"
+#include "hal.h"
+#include "idt.h"
 #include "../drivers/ports.h"
 #include "../drivers/printk.h"
+#include "../drivers/screen.h"
 #include "../libc/function.h"
 
-u32 tick = 0;
-
+volatile u32 tick = 0;
+static unsigned char y, x;
 static void timer_callback(registers_t regs)
 {
     tick++;
-    printk("Timer ticks : %d \n", tick);
+    // if(tick < 5) 
+    
+	get_cursor_xy(&x, &y);
+    set_cursor_xy(0, 0);
+    printk("Timer ticks : %d \r", tick);
+    set_cursor_xy(x, y);
     UNUSED(regs);
+
+    interruptdone(0); // its interrupt request 0
 }
 
 void init_timer(u32 freq)
@@ -31,4 +41,11 @@ void init_timer(u32 freq)
 
 unsigned int get_timer_ticks() {
     return tick;
+}
+
+void sleep (unsigned int ms) {
+	unsigned int ticks = ms + get_timer_ticks();
+     printk("\n Entering sleep at: %d.", get_timer_ticks());
+	while (ticks > get_timer_ticks ());
+    printk("\n Exiting sleep at: %d.", get_timer_ticks());
 }

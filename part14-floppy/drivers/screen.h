@@ -19,6 +19,7 @@ void kprint_at(char *message, int col, int row);
 void kprint(char *message);
 void monitor_put(char c);
 void get_cursor_xy (unsigned char * x, unsigned char * y);
+void set_cursor_xy(unsigned char x, unsigned char y);
 unsigned char get_screen_width();
 unsigned char get_screen_height();
 // Clear the screen to all black.

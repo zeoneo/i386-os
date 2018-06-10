@@ -37,6 +37,12 @@ void get_cursor_xy (unsigned char * x, unsigned char * y) {
 	*y = cursor_y;
 }
 
+void set_cursor_xy(unsigned char x, unsigned char y) {
+    cursor_x = x;
+    cursor_y = y;
+}
+
+
 //Scrolls the text on the screen up by one line.
 static void scroll()
 {

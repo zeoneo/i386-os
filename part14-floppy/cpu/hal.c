@@ -1,16 +1,26 @@
 #include "hal.h"
+#include "gdt.h"
+#include "idt.h"
+#include "isr.h"
+#include "timer.h"
 #include "pic.h"
 
 void hal_initialize() {
 	//! initialize motherboard controllers and system timer
-	i86_cpu_initialize ();
+	disable_interrupts();
+	i86_gdt_initialize();
+	i86_idt_initialize(0x8);
+	i86_pic_initialize(0x20,0x28);
+	init_timer(100);
+	isr_install();
+	enable_interrupts();
 }
 
-void disable() {
+void disable_interrupts() {
     asm volatile("cli");
 }
 
-void enable() {
+void enable_interrupts() {
     asm volatile("sti");
 }
 

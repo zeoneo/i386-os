@@ -4,10 +4,7 @@
 #include "../drivers/printk.h"
 #include "../drivers/screen.h"
 // sleeps a little bit. This uses the HALs get_tick_count() which in turn uses the PIT
-void sleep (unsigned int ms) {
-	unsigned int ticks = ms + get_timer_ticks();
-	while (ticks > get_timer_ticks ());
-}
+
 
 //! wait for key stroke
 enum KEYCODE	getch () {
