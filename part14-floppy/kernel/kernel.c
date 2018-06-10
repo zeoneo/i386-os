@@ -1,11 +1,7 @@
-
-#include "../drivers/vga.h"
 #include "bootinfo.h"
-#include "../cpu/isr.h"
-#include "../cpu/idt.h"
-#include "../cpu/gdt.h"
+#include "../cpu/hal.h"
 #include "../drivers/kybrd.h"
-// #include "../drivers/keyboard.h"
+#include "../drivers/flpydsk.h"
 #include "../drivers/printk.h"
 #include "../drivers/screen.h"
 #include "shell.h"
@@ -44,13 +40,10 @@ void init(struct multiboot_info * bootinfo)
     uint32_t memSize = 1024 + bootinfo->m_memoryLo + bootinfo->m_memoryHi*64;
     int i;
 
-	asm volatile("cli");
+
 	
     clear_screen_with_color (0x13);
 	goto_xy (0,0);
-	screen_set_color (0x17);
-	printk("Kernel blocks: %d ", kernelSize);
-	
 	printk ("Zeus is loading...\n");
 	goto_xy (0,24);
 	screen_set_color (0x3F);
@@ -60,15 +53,13 @@ void init(struct multiboot_info * bootinfo)
 
     printk("pmm initialized with %d KB physical memory; memLo: %d memHi: %d\n\n", memSize, bootinfo->m_memoryLo,bootinfo->m_memoryHi);
 	
-    isr_install();
-	init_timer(50);
+	disable_interrupts();
+	vmmngr_initialize ();
+	hal_initialize();
+	enable_interrupts();
+
     /* Comment out the timer IRQ handler to read
      * the keyboard IRQs easier */
-
-
-	
-	asm volatile("sti");
-
 
     printk("kernel size %d kernel_end:%x", kernelSize, &kernel_end);
     	// ! get memory size in KB
@@ -117,12 +108,35 @@ void init(struct multiboot_info * bootinfo)
 	screen_set_color (0x12);
 
 	//! initialize our vmm
-	vmmngr_initialize ();
+
 
 	kkybrd_install(33);
+
+	flpydsk_set_working_drive (0);
+
+	printk("Chose floppy drive");
+	//! install floppy disk to IR 38, uses IRQ 6
+	flpydsk_install ();
+
+	// printk("Install flpy irq");
 }
 
+void readSector() {
+	uint8_t* sector = flpydsk_read_sector (0);
 
+	if (sector!=0) {
+
+		int i = 0;
+		int c, j;
+		for ( c = 0; c < 4; c++ ) {
+			for (j = 0; j < 128; j++)
+				printk ("0x%x ", sector[ i + j ]);
+			i += 128;
+		}
+	} else {
+		printk("Failed to read sector");
+	}
+}
 
 void main(struct multiboot_info * bootinfo) {
 	init (bootinfo);
@@ -131,8 +145,10 @@ void main(struct multiboot_info * bootinfo) {
 	goto_xy (0,0);
 	printk ("\nType \"exit\" to quit, \"help\" for a list of commands\n");
 	printk ("+-------------------------------------------------------+\n");
-	run ();
-	printk ("\nExit command recieved; demo halted");
+	// run ();
+	// printk ("\nExit command recieved; demo halted");
+	readSector();
+	
 	for (;;);
 	return 0;
 }

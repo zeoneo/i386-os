@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 //! install floppy driver
-void flpydsk_install (int irq);
+void flpydsk_install ();
 
 //! set current working drive
 void flpydsk_set_working_drive (uint8_t drive);

@@ -159,6 +159,9 @@ const int FLPY_SECTORS_PER_TRACK = 18;
 //! You can change this as needed. It must be below 16MB and in idenitity mapped memory!
 const int DMA_BUFFER = 0x1000;
 
+uint8_t primary_avail = 0;
+uint8_t secondary_avail = 0;
+
 //============================================================================
 //    IMPLEMENTATION PRIVATE CLASS PROTOTYPES / EXTERNAL CLASS REFERENCES
 //============================================================================
@@ -293,6 +296,7 @@ inline void flpydsk_wait_irq () {
 
 //!	floppy disk irq handler
 void i86_flpy_irq () {
+	printk("Floppy IRQ");
 	//! irq fired
 	_FloppyDiskIRQ = 1;
 
@@ -501,13 +505,39 @@ void flpydsk_lba_to_chs (int lba,int *head,int *track,int *sector) {
    *sector = lba % FLPY_SECTORS_PER_TRACK + 1;
 }
 
+inline void __parse_cmos(uint8_t primary, uint8_t secondary)
+{
+	if(primary != 0)
+	{
+		primary_avail = 1;
+		printk("Primary FDC channel available.\n");
+	}
+	if(secondary != 0)
+	{
+		secondary_avail = 1;
+		printk("Secondary FDC channel available.\n");
+	}
+
+}
+
 //! install floppy driver
-void flpydsk_install (int irq) {
+void flpydsk_install () {
 
 	//! install irq handler
-	set_idt_gate (IRQ6, i86_flpy_irq);
+	
 
+	printk("Looking for floppy devices\n");
+	port_byte_out(0x70, 0x10);
+	uint8_t cmos = port_byte_in(0x71);
+	__parse_cmos((cmos&0xf0) >> 4, cmos&0x0f);
+	if(!primary_avail) {
+		printk("Halting primary no avail");
+	} else {
+		printk("Registering FDC IRQ\n");
+	}
 
+	register_interrupt_handler (IRQ6, i86_flpy_irq);
+	
 	//! initialize the DMA for FDC
 	flpydsk_initialize_dma ();
 
@@ -553,6 +583,8 @@ uint8_t* flpydsk_read_sector (int sectorLBA) {
 	//! warning: this is a bit hackish
 	return (uint8_t*) DMA_BUFFER;
 }
+
+
 
 //============================================================================
 //    INTERFACE CLASS BODIES
